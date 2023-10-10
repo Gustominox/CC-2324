@@ -1,4 +1,4 @@
-class Pear:
+class FS_NODE:
 
     def __init__(self, conf_file, port = 9090):
 

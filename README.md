@@ -15,8 +15,11 @@ Requesitos:
 Etapas sugeridas para esta fase:
 
 1. Especificar o protocolo FS Track Protocol para funcionar sobre TCP
+
    - formato das mensagens protocolares (sintaxe)
    - função e significado dos campos (semântica)
    - diagrama temporal ilustrativo (comportamento)
+
+   (NAO PRIORITARIO)
 2. Implementação e teste do protocolo FS Track Protocol
    exemplo de teste: registar um FS_Node (endereço) e ficheiros/blocos a seu cargo; pedir localização de um ficheiro;
