@@ -21,13 +21,14 @@ class FS_Node:
         soc.connect((sendAdress, self.porta))
 
         try:
+            
             soc.sendall("REGIST FS_NODE".encode('utf-8'))
 
         except:
             debug("Impossivel Conectar")
         
-        msg = soc.recv(1024)
-        line = msg.decode('utf-8')
+        # msg = soc.recv(1024)
+        # line = msg.decode('utf-8')
 
         soc.close()
             
@@ -36,8 +37,8 @@ class FS_Node:
         
 def main():
     
-    tracker = FS_Tracker()
-    tracker.FS_TRACK_PROTOCOL() 
+    node = FS_Node()
+    node.startTCP() 
     
 if __name__ == "__main__":
     main()

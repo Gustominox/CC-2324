@@ -1,3 +1,4 @@
+import socket
 class FS_Tracker:
 
 
@@ -20,15 +21,12 @@ class FS_Tracker:
         s.listen()
 
         connection, address = s.accept()
-        
-        
+                
         while True:
             data = connection.recv(1024)
             if not data:
                 break
-            msg = connection.recv(1024)
-            line = msg.decode('utf-8')
-            print(line)
+            line = data.decode('utf-8')
 
         
 def main():
