@@ -1,4 +1,6 @@
 import socket
+import threading
+
 class FS_Tracker:
 
 
@@ -8,7 +10,8 @@ class FS_Tracker:
 
 
 
-
+        self.entrys = []
+        
         self.hostname = socket.gethostname()
         self.endereco = socket.gethostbyname(self.hostname)  
         self.porta = port
@@ -27,12 +30,18 @@ class FS_Tracker:
             if not data:
                 break
             line = data.decode('utf-8')
+            self.entrys.append(line)
+            print(f"RECEIVED: \"{line}\" ")
 
         
 def main():
     
     tracker = FS_Tracker()
-    tracker.FS_TRACK_PROTOCOL() 
+    c = ''
+    while True:
+        threading.Thread(target=tracker.FS_TRACK_PROTOCOL()).start()
+        print(tracker.entrys)
+
     
 if __name__ == "__main__":
     main()

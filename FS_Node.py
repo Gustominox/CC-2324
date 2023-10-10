@@ -13,7 +13,7 @@ class FS_Node:
         self.endereco = socket.gethostbyname(self.hostname)  
         self.porta = port
 
-    def startTCP(self, sendAdress = "127.0.0.1"):
+    def updateEntrys(self, sendAdress = "127.0.0.1"):
         
         soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
                           socket.SOCK_STREAM)  # Connection-Oriented (TCP PROTOCOL)
@@ -21,11 +21,9 @@ class FS_Node:
         soc.connect((sendAdress, self.porta))
 
         try:
-            
-            soc.sendall("REGIST FS_NODE".encode('utf-8'))
-
+            soc.sendall("UPDATE FS_NODE".encode('utf-8'))
         except:
-            debug("Impossivel Conectar")
+            print("Impossivel Conectar")
         
         # msg = soc.recv(1024)
         # line = msg.decode('utf-8')
@@ -38,7 +36,7 @@ class FS_Node:
 def main():
     
     node = FS_Node()
-    node.startTCP() 
+    node.updateEntrys() 
     
 if __name__ == "__main__":
     main()
