@@ -13,3 +13,4 @@ class Pear:
         self.endereco = socket.gethostbyname(self.hostname)  # '10.0.0.1'
         self.porta = port
 
+    
