@@ -3,7 +3,7 @@
 Projeto CC 2023-2024
 
 
-Requesitos:
+Requisitos:
 
 - O protocolo FS TRACK Protocol deve funcionar sobre TCP e suportar:
   - O registo de um FS_NODE
