@@ -33,13 +33,12 @@ class FS_Tracker:
         
     
     def startEntryControl(self):
-        entrys = 0
         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
         soc.bind(('', self.porta))            
         soc.listen()
 
-        while entrys < 2:
+        while True:
             
             connection, address = soc.accept() # Diferenciar que tipo de msg o node esta a enviar
             data = connection.recv(1024)
@@ -51,13 +50,18 @@ class FS_Tracker:
                 t = threading.Thread(target=self.FS_TRACK_PROTOCOL,args= (soc,))
                 t.start()
                 t.join()
-                entrys += 1
             elif msg == "DELETE FS_NODE":
                 continue
+            elif msg == "FILES LIST":
+                connection.send(str(self.entrys).encode())
+                continue
+            elif msg == "END TRACKER":
+                soc.close()
+                break
             else:
                 logging.error(f"INVALID MESSAGE FROM NODE: {msg}")
                 
-        soc.close()
+        
         
             
 def main():
@@ -65,7 +69,7 @@ def main():
     logging.basicConfig(format=format, level=logging.INFO)
     
     tracker = FS_Tracker()
-
+    tracker.entrys.append("DEFAULT ENTRY")
     tcp = threading.Thread(target=tracker.startEntryControl)
     tcp.start()
     
