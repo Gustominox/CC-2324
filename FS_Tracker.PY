@@ -17,15 +17,11 @@ class FS_Tracker:
         self.endereco = socket.gethostbyname(self.hostname)  
         self.porta = port
         
-    def FS_TRACK_PROTOCOL(self):
+    def FS_TRACK_PROTOCOL(self,soc):
+        logging.info("Thread: Listening for node tcp message")
+        connection, address = soc.accept() 
+        # ler a msg q o node envia
         
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
-        s.bind(('', self.porta))            
-        s.listen()
-
-        connection, address = s.accept()
-                
         while True:
             data = connection.recv(1024)
             if not data:
@@ -33,16 +29,36 @@ class FS_Tracker:
             line = data.decode('utf-8')
             self.entrys.append(line)
             # print(f"RECEIVED: \"{line}\" ")
+        logging.info("Thread: Ended node tcp message")
         
-        s.close()
     
     def startEntryControl(self):
         entrys = 0
+        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
+        soc.bind(('', self.porta))            
+        soc.listen()
+
         while entrys < 2:
-            t = threading.Thread(target=self.FS_TRACK_PROTOCOL)
-            t.start()
-            t.join()
-            entrys += 1
+            
+            connection, address = soc.accept() # Diferenciar que tipo de msg o node esta a enviar
+            data = connection.recv(1024)
+            msg = data.decode('utf-8')
+            
+            if msg == "UPDATE FS_NODE":
+                logging.info("Received update request")
+                
+                t = threading.Thread(target=self.FS_TRACK_PROTOCOL,args= (soc,))
+                t.start()
+                t.join()
+                entrys += 1
+            elif msg == "DELETE FS_NODE":
+                continue
+            else:
+                logging.error(f"INVALID MESSAGE FROM NODE: {msg}")
+                
+        soc.close()
+        
             
 def main():
     format = "%(asctime)s: %(message)s"
@@ -52,10 +68,9 @@ def main():
 
     tcp = threading.Thread(target=tracker.startEntryControl)
     tcp.start()
-    logging.info("Thread starting")
     
     tcp.join()
-    # print(tracker.entrys)
+    print(tracker.entrys)
     logging.info("ENDED NORMAL EXECUTION")
 
     

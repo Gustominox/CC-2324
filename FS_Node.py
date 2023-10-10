@@ -1,5 +1,5 @@
 import socket
-
+import sys
 class FS_Node:
 
     def __init__(self, port = 9090):
@@ -21,7 +21,7 @@ class FS_Node:
         soc.connect((sendAdress, self.porta))
 
         try:
-            soc.sendall("UPDATE FS_NODE".encode('utf-8'))
+            soc.sendall(sys.argv[1].encode('utf-8'))
         except:
             print("Impossivel Conectar")
         
@@ -37,6 +37,7 @@ def main():
     
     node = FS_Node()
     node.updateEntrys() 
+    
     
 if __name__ == "__main__":
     main()
