@@ -1,5 +1,6 @@
 import socket
 import threading
+import logging
 
 class FS_Tracker:
 
@@ -31,16 +32,31 @@ class FS_Tracker:
                 break
             line = data.decode('utf-8')
             self.entrys.append(line)
-            print(f"RECEIVED: \"{line}\" ")
-
+            # print(f"RECEIVED: \"{line}\" ")
         
+        s.close()
+    
+    def startEntryControl(self):
+        entrys = 0
+        while entrys < 2:
+            t = threading.Thread(target=self.FS_TRACK_PROTOCOL)
+            t.start()
+            t.join()
+            entrys += 1
+            
 def main():
+    format = "%(asctime)s: %(message)s"
+    logging.basicConfig(format=format, level=logging.INFO)
     
     tracker = FS_Tracker()
-    c = ''
-    while True:
-        threading.Thread(target=tracker.FS_TRACK_PROTOCOL()).start()
-        print(tracker.entrys)
+
+    tcp = threading.Thread(target=tracker.startEntryControl)
+    tcp.start()
+    logging.info("Thread starting")
+    
+    tcp.join()
+    # print(tracker.entrys)
+    logging.info("ENDED NORMAL EXECUTION")
 
     
 if __name__ == "__main__":
