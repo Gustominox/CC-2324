@@ -43,24 +43,32 @@ class FS_Tracker:
             connection, address = soc.accept() # Diferenciar que tipo de msg o node esta a enviar
             data = connection.recv(1024)
             msg = data.decode('utf-8')
+            pckg = self.tcpDecode(msg)
             
-            if msg == "UPDATE FS_NODE":
+            if pckg[0] == "UPDATE NODE":
                 logging.info("Received update request")
                 
-                t = threading.Thread(target=self.FS_TRACK_PROTOCOL,args= (soc,))
-                t.start()
-                t.join()
-            elif msg == "DELETE FS_NODE":
+                for entry in pckg[1:]:
+                    self.entrys.append(entry)
+                
+            elif pckg[0] == "DELETE NODE":
                 continue
-            elif msg == "FILES LIST":
+            elif pckg[0] == "FILES LIST":
                 connection.send(str(self.entrys).encode())
                 continue
-            elif msg == "END TRACKER":
+            elif pckg[0] == "END TRACKER":
                 soc.close()
                 break
             else:
-                logging.error(f"INVALID MESSAGE FROM NODE: {msg}")
-                
+                logging.error(f"INVALID MESSAGE FROM NODE: {pckg[0]}")
+    
+    def tcpDecode(self,msg):
+        pckg = []
+        for line in msg.split('\n'):
+            if not line[0] == '#':
+                pckg.append(line)
+        return pckg 
+            
         
         
             
