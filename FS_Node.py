@@ -3,6 +3,7 @@ import sys
 
 message = """# HEADER
 UPDATE NODE
+
 # BODY
 FILE1 SEG=[...] SIZE
 FILE2 SEG=[...] SIZE

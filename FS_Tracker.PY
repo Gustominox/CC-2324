@@ -65,7 +65,7 @@ class FS_Tracker:
     def tcpDecode(self,msg):
         pckg = []
         for line in msg.split('\n'):
-            if not line[0] == '#':
+            if not (line == '' or line[0] == '#' ):
                 pckg.append(line)
         return pckg 
             
