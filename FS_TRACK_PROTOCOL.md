@@ -2,6 +2,7 @@
 
 Qualquer linha que comece por '#' é considerado um comentario e por isso ignorada na mensagem
 Qualquer linha em branco deve ser ignorada
+
 ```markdown
 # HEADER
 UPDATE NODE
@@ -13,8 +14,6 @@ FILE3 SEG=[...] SIZE
 
 ```markdown
 # HEADER
-
 FILES LIST
-
 # BODY
 ```
