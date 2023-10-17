@@ -89,19 +89,19 @@ class FS_Tracker:
         self.endereco = socket.gethostbyname(self.hostname)  
         self.porta = port
         
-    def FS_TRACK_PROTOCOL(self,soc):
-        logging.info("Thread: Listening for node tcp message")
-        connection, address = soc.accept() 
-        # ler a msg q o node envia
+    # def FS_TRACK_PROTOCOL(self,soc):
+    #     logging.info("Thread: Listening for node tcp message")
+    #     connection, address = soc.accept() 
+    #     # ler a msg q o node envia
         
-        while True:
-            data = connection.recv(1024)
-            if not data:
-                break
-            line = data.decode('utf-8')
-            self.entrys.append(line)
-            # print(f"RECEIVED: \"{line}\" ")
-        logging.info("Thread: Ended node tcp message")
+    #     while True:
+    #         data = connection.recv(1024)
+    #         if not data:
+    #             break
+    #         line = data.decode('utf-8')
+    #         self.entrys.append(line)
+    #         # print(f"RECEIVED: \"{line}\" ")
+    #     logging.info("Thread: Ended node tcp message")
         
     
     def startEntryControl(self):
