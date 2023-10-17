@@ -1,5 +1,5 @@
 
-class FS_Tracker_Table:
+class FS_Table:
     def __init__(self):
         self.contents = {}  # Inicia o nodo vazio
         self.node_counter = 1 # Inicializa o counter global a 1 (autoincrementado)
@@ -8,6 +8,11 @@ class FS_Tracker_Table:
     def __str__(self):
         return
     
+    def addCompleteNode(self,nodeId, address, fragments[20], file)
+        add_node(self,nodeId,address)
+        add_file_with_fragments(self,nodeId,file)
+        add_
+
     def add_node(self, node_id, address):
         # Adiciona um nodo ao tracker
         node_id = self.node_counter
@@ -23,7 +28,7 @@ class FS_Tracker_Table:
         fragments = [False] * 20
         self.contents[node_id][file_id] = fragments
 
-    def update_fragment_status(self, node_id, file_id, fragment_index, status): #incluir lista de fragmentos
+    def update_fragment_status(self, node_id, file_id, fragments[20], status): #incluir lista de fragmentos
         # Dá update ao fragmento de um ficheiro para um dado estado (Tanto para adicionar como remover)
         if node_id in self.contents and file_id in self.contents[node_id]:
             if 0 <= fragment_index < 20:
