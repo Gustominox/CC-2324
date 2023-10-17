@@ -125,6 +125,7 @@ class FS_Tracker:
                 
                 for entry in pckg[1:]:
                     self.entrys.append(entry)
+                    self.table.add_node_to_table(node_id,files_list)
                 
             elif pckg[0] == "DELETE NODE":
                 continue

@@ -3,6 +3,17 @@
 Qualquer linha que comece por '#' é considerado um comentario e por isso ignorada na mensagem
 Qualquer linha em branco deve ser ignorada
 
+tipos de mensagens:
+
+"UPDATE NODE"
+
+"DELETE NODE"
+
+"FILES LIST"
+
+"END TRACKER"
+
+
 ```markdown
 # NODE_ID 
 IP=senderIp
