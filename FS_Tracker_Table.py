@@ -2,7 +2,6 @@
 class FS_Table:
     def __init__(self):
         self.contents = {}  # Inicia o nodo vazio
-        self.node_counter = 1 # Inicializa o counter global a 1 (autoincrementado)
         self.address = {} # Inicializa o endereço do nodo
     
     def __str__(self):
@@ -11,10 +10,9 @@ class FS_Table:
 
     def addNode(self, node_id, address):
         # Adiciona um nodo ao tracker
-        node_id = self.node_counter
+        self.node_id = node_id
         self.contents[node_id] = {}
         self.node_addresses[node_id] = address
-        self.node_counter += 1
         return node_id
 
     def addFileFragments(self, node_id, file_id):
@@ -37,26 +35,26 @@ class FS_Table:
         self.addFileFragments(nodeId, fileId)
         self.updateFragments(nodeId, fileId, fragments)
     
-    def remove_file_from_node(self, node_id, file_id):
+    def removeFileFromNode(self, node_id, file_id):
         # Remove um ficheiro de um nodo
         if node_id in self.contents and file_id in self.contents[node_id]:
             del self.contents[node_id][file_id]
     
-    def remove_node(self, node_id):
+    def removeNode(self, node_id):
         # Remove a node and all its associated information from the table
         if node_id in self.contents:
             del self.contents[node_id]
         if node_id in self.node_addresses:
             del self.node_addresses[node_id]
 
-    def get_fragment_status(self, node_id, file_id):
+    def getFragmentStatus(self, node_id, file_id):
         # Verifica o estado de fragmentos de um ficheiro (Para verificação manual?)
         if node_id in self.contents and file_id in self.contents[node_id]:
             return self.contents[node_id][file_id]
         else:
             return None
 
-    def get_nodes_with_fragment(self, file_id, fragment_index):
+    def getNodesWithFragment(self, file_id, fragment_index):
         # Retorna os nodos que têm um fragmento de um ficheiro
         nodes_with_fragment = []
         for node_id, files in self.contents.items():
@@ -66,7 +64,7 @@ class FS_Table:
                     nodes_with_fragment.append(node_id)
         return nodes_with_fragment
     
-    def get_nodes_with_filename(self, filename):
+    def getNodesWithFilename(self, filename):
         # Verifica os nodos que têm um ficheiro
         nodes_with_filename = []
         for node_id, files in self.contents.items():
@@ -74,11 +72,11 @@ class FS_Table:
                 nodes_with_filename.append(node_id)
         return nodes_with_filename
 
-    def get_table_of_contents(self):
+    def getContents(self):
         # Retorna a tabela de nodos
         return self.contents
     
-    def get_node_address(self, node_id):
+    def getNodeAddress(self, node_id):
         # Retorna o endereço de um nodo
         return self.node_addresses.get(node_id)
     
