@@ -8,12 +8,8 @@ class FS_Table:
     def __str__(self):
         return
     
-    def addCompleteNode(self,nodeId, address, fragments[20], file)
-        add_node(self,nodeId,address)
-        add_file_with_fragments(self,nodeId,file)
-        add_
 
-    def add_node(self, node_id, address):
+    def addNode(self, node_id, address):
         # Adiciona um nodo ao tracker
         node_id = self.node_counter
         self.contents[node_id] = {}
@@ -21,18 +17,25 @@ class FS_Table:
         self.node_counter += 1
         return node_id
 
-    def add_file_with_fragments(self, node_id, file_id):
+    def addFileFragments(self, node_id, file_id):
         # Adiciona um ficheiro a um nodo com os fragmentos inicializados a falso
         if node_id not in self.contents:
             self.contents[node_id] = {}
         fragments = [False] * 20
         self.contents[node_id][file_id] = fragments
 
-    def update_fragment_status(self, node_id, file_id, fragments[20], status): #incluir lista de fragmentos
+    def updateFragments(self, node_id, file_id, fragments): #incluir lista de fragmentos
         # Dá update ao fragmento de um ficheiro para um dado estado (Tanto para adicionar como remover)
-        if node_id in self.contents and file_id in self.contents[node_id]:
-            if 0 <= fragment_index < 20:
-                self.contents[node_id][file_id][fragment_index] = status
+        if self.contents[node_id][file_id]:    
+            i = 0
+            while i < 20:
+                self.contents[node_id][file_id][fragments[i]]=fragments[i]
+                i += 1
+    
+    def addCompleteNode(self, nodeId, address, fragments, fileId):
+        self.addNode(nodeId, address)
+        self.addFileFragments(nodeId, fileId)
+        self.updateFragments(nodeId, fileId, fragments)
     
     def remove_file_from_node(self, node_id, file_id):
         # Remove um ficheiro de um nodo
