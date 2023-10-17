@@ -119,7 +119,7 @@ class FS_Tracker:
             data = connection.recv(1024)
             msg = data.decode('utf-8')
             pckg = self.tcpDecode(msg)
-            
+            print(pckg)
             if pckg[0] == "UPDATE NODE":
                 logging.info("Received update request")
                 
