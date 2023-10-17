@@ -26,7 +26,7 @@ class FS_Tracker_Table:
         fragments = [False] * 20
         self.contents[node_id][file_id] = fragments
 
-    def update_fragment_status(self, node_id, file_id, fragment_index, status):
+    def update_fragment_status(self, node_id, file_id, fragment_index, status): #incluir lista de fragmentos
         # Dá update ao fragmento de um ficheiro para um dado estado (Tanto para adicionar como remover)
         if node_id in self.contents and file_id in self.contents[node_id]:
             if 0 <= fragment_index < 20:
@@ -76,6 +76,20 @@ class FS_Tracker_Table:
     def get_node_address(self, node_id):
         # Retorna o endereço de um nodo
         return self.node_addresses.get(node_id)
+    
+    def writeTable(self):
+        string = []
+
+        for node_id in self.contents.items():
+            string.append("\nNodo->")
+            string.append(node_id)
+            string.append("Ficheiros->")
+            for files in self.contents[node_id]:
+                string.append(files)
+                string.append(", ")
+        
+        return string
+            
 
 class FS_Tracker:
 
