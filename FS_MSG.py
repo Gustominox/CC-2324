@@ -10,4 +10,4 @@ class FS_MSG:
         return
     
     def read_message(self,data):
-        
+        print(data)

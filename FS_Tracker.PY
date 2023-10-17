@@ -2,7 +2,7 @@ import socket
 import threading
 import logging
 import FS_Tracker_Table
-          
+import FS_MSG
 
 class FS_Tracker:
 
@@ -46,7 +46,10 @@ class FS_Tracker:
             data = connection.recv(1024)
             msg = data.decode('utf-8')
             pckg = self.tcpDecode(msg)
-            print(pckg)
+            
+            message = FS_MSG()
+            message.read_message(pckg)
+            
             if pckg[0] == "UPDATE NODE":
                 logging.info("Received update request")
                 
