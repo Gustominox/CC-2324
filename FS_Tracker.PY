@@ -1,6 +1,7 @@
 import socket
 import threading
 import logging
+import sys
 from FS_Tracker_Table import FS_Table
 from FS_MSG import FS_Msg
 
@@ -53,9 +54,10 @@ class FS_Tracker:
             
             if message.MSG_TYPE == "UPDATE NODE":
                 logging.info("Received update request")
-                
-                # self.table.addCompleteNode( message.SENDER_ID, message.SENDER_IP, fragments, fileId)
-    
+                self.table.addNode(message.SENDER_ID)
+                self.table.addFile(message.SENDER_ID,"FILE1")
+
+                print(self.table)
             elif message.MSG_TYPE == "DELETE NODE":
                 continue
             elif message.MSG_TYPE == "FILES LIST":
@@ -80,8 +82,10 @@ class FS_Tracker:
 def main():
     format = "%(asctime)s: %(message)s"
     logging.basicConfig(format=format, level=logging.INFO)
-    
-    tracker = FS_Tracker()
+    if sys.argv[1]:
+        tracker = FS_Tracker(int(sys.argv[1]))
+    else:
+        tracker = FS_Tracker()
     tracker.entrys.append("DEFAULT ENTRY")
     tcp = threading.Thread(target=tracker.startEntryControl)
     tcp.start()
