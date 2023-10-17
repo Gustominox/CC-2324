@@ -11,3 +11,18 @@ class FS_MSG:
     
     def read_message(self,data):
         print(data)
+        
+        for line in data:
+            line.split(";")
+            for field in line:
+                field.split("=")
+                
+                if field[0] == "SENDER_ID":
+                    self.SENDER_ID = field[1]
+                elif field[0] == "MSG_TYPE":
+                    self.MSG_TYPE = field[1]
+                elif field[0] == "BODY":
+                    body = ''.join(field[1].splitlines().strip("\{\} ").split(","))
+                    
+                else:
+                  pass

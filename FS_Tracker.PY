@@ -14,7 +14,7 @@ class FS_Tracker:
 
 
         self.entrys = []
-        self.table = FS_Tracker_Table()
+        self.table = FS_TABLE()
         self.hostname = socket.gethostname()
         self.endereco = socket.gethostbyname(self.hostname)  
         self.porta = port
