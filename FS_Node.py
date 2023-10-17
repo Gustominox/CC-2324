@@ -1,13 +1,19 @@
 import socket
 import sys
 
-message = """# HEADER
-UPDATE NODE
-
+message = """
+# NODE_ID 
+SENDER_ID=LegionGusto;
+# NODE_IP 
+SENDER_IP=127.0.0.1;
+# HEADER
+MSG_TYPE=UPDATE NODE;
 # BODY
-FILE1 SEG=[...] SIZE
-FILE2 SEG=[...] SIZE
-FILE3 SEG=[...] SIZE """
+BODY={
+FILE1 SEG [...] SIZE,
+FILE2 SEG [...] SIZE,
+FILE3 SEG [...] SIZE
+};"""
 
 
 class FS_Node:
