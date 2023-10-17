@@ -1,8 +1,8 @@
 import socket
 import threading
 import logging
-import FS_Tracker_Table
-import FS_MSG
+from FS_Tracker_Table import FS_Table
+from FS_MSG import FS_Msg
 
 class FS_Tracker:
 
@@ -14,7 +14,7 @@ class FS_Tracker:
 
 
         self.entrys = []
-        self.table = FS_TABLE()
+        self.table = FS_Table()
         self.hostname = socket.gethostname()
         self.endereco = socket.gethostbyname(self.hostname)  
         self.porta = port
@@ -47,32 +47,31 @@ class FS_Tracker:
             msg = data.decode('utf-8')
             pckg = self.tcpDecode(msg)
             
-            message = FS_MSG()
+            message = FS_Msg()
             message.read_message(pckg)
+            print(message)
             
-            if pckg[0] == "UPDATE NODE":
+            if message.MSG_TYPE == "UPDATE NODE":
                 logging.info("Received update request")
                 
-                for entry in pckg[1:]:
-                    self.entrys.append(entry)
-                    self.table.add_node_to_table(node_id,files_list)
-                
-            elif pckg[0] == "DELETE NODE":
+                # self.table.addCompleteNode( message.SENDER_ID, message.SENDER_IP, fragments, fileId)
+    
+            elif message.MSG_TYPE == "DELETE NODE":
                 continue
-            elif pckg[0] == "FILES LIST":
+            elif message.MSG_TYPE == "FILES LIST":
                 connection.send(str(self.entrys).encode())
                 continue
-            elif pckg[0] == "END TRACKER":
+            elif message.MSG_TYPE == "END TRACKER":
                 soc.close()
                 break
             else:
-                logging.error(f"INVALID MESSAGE FROM NODE: {pckg[0]}")
+                logging.error(f"INVALID MESSAGE FROM NODE: {message.MSG_TYPE}")
     
     def tcpDecode(self,msg):
-        pckg = []
+        pckg = ""
         for line in msg.split('\n'):
             if not (line == '' or line[0] == '#' ):
-                pckg.append(line)
+                pckg += line
         return pckg 
             
         
