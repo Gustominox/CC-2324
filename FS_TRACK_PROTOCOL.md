@@ -4,8 +4,10 @@ Qualquer linha que comece por '#' é considerado um comentario e por isso ignora
 Qualquer linha em branco deve ser ignorada
 
 ```markdown
+# NODE_ID 
+IP=senderIp
 # HEADER
-UPDATE NODE
+MSGTYPE=UPDATE NODE
 # BODY
 FILE1 SEG=[...] SIZE
 FILE2 SEG=[...] SIZE

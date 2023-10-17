@@ -8,6 +8,9 @@ class FS_Tracker_Table:
         self.node_counter = 1 # Inicializa o counter global a 1 (autoincrementado)
         self.address = {} # Inicializa o endereço do nodo
     
+    def __str__(self):
+        return
+    
     def add_node(self, node_id, address):
         # Adiciona um nodo ao tracker
         node_id = self.node_counter
@@ -84,7 +87,7 @@ class FS_Tracker:
 
 
         self.entrys = []
-        
+        self.table = FS_Tracker_Table()
         self.hostname = socket.gethostname()
         self.endereco = socket.gethostbyname(self.hostname)  
         self.porta = port
