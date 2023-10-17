@@ -16,13 +16,15 @@ tipos de mensagens:
 
 ```markdown
 # NODE_ID 
-IP=senderIp
+SENDER_ID=senderIp
 # HEADER
-MSGTYPE=UPDATE NODE
+MSG_TYPE=UPDATE NODE
 # BODY
-FILE1 SEG=[...] SIZE
-FILE2 SEG=[...] SIZE
+BODY={
+FILE1 SEG=[...] SIZE,
+FILE2 SEG=[...] SIZE,
 FILE3 SEG=[...] SIZE
+}
 ```
 
 ```markdown
