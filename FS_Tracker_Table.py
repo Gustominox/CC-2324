@@ -2,7 +2,6 @@
 class FS_Table:
     def __init__(self):
         self.contents = {}  # Inicia o nodo vazio
-        self.node_counter = 1 # Inicializa o counter global a 1 (autoincrementado)
         self.address = {} # Inicializa o endereço do nodo
     
     def __str__(self):
@@ -11,7 +10,7 @@ class FS_Table:
 
     def addNode(self, node_id, address):
         # Adiciona um nodo ao tracker
-        node_id = self.node_counter
+        node_id = node_id
         self.contents[node_id] = {}
         self.node_addresses[node_id] = address
         self.node_counter += 1
