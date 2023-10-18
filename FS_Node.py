@@ -117,8 +117,6 @@ def main():
         node.askForList()
     elif sys.argv[1] == "UPDATE NODE":
         node.sendTcpMsgFromFile(sys.argv[2])
-    elif sys.argv[1] == "END TRACKER":
-        node.sendTcpMsg(messageEnd)
     else:
         print("ERROR: Unknown command")
 
