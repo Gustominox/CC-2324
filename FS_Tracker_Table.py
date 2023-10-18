@@ -28,12 +28,14 @@ class FS_Table:
         self.contents[node_id] = {}
         return node_id
 
-    def addFile(self, node_id, file_id, fragments=[False] * 20, file_size="FILE SIZE"):
+    def addFile(self, node_id, file_id, body):
         # Adiciona um ficheiro a um nodo com os fragmentos inicializados a falso
         if node_id not in self.contents:
             self.addNode(node_id)
-        self.contents[node_id][file_id] = [file_size,fragments]
-
+        
+        for newFile in body:    
+            self.contents[node_id][newFile] = body[newFile] 
+        
     def updateFragments(self, node_id, file_id, fragments):  # incluir lista de fragmentos
         # Dá update ao fragmento de um ficheiro para um dado estado (Tanto para adicionar como remover)
         if self.contents[node_id][file_id]:
