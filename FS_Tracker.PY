@@ -50,13 +50,14 @@ class FS_Tracker:
             
             message = FS_Msg()
             message.read_message(pckg)
-            print(message)
             
             if message.MSG_TYPE == "UPDATE NODE":
                 logging.info("Received update request")
                 self.table.addNode(message.SENDER_ID)
                 self.table.addFile(message.SENDER_ID,message.SENDER_ID,message.BODY)
 
+                logging.info(f"MESSAGE RECEIVED: \n{message.toText()}")
+                
                 print(self.table)
             elif message.MSG_TYPE == "DELETE NODE":
                 continue
