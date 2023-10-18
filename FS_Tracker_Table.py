@@ -25,13 +25,14 @@ class FS_Table:
     def addNode(self, node_id):
         # Adiciona um nodo ao tracker
         # self.node_id = node_id
-        self.contents[node_id] = {}
+        if node_id not in self.contents:
+            self.contents[node_id] = {}
         return node_id
 
     def addFile(self, node_id, file_id, body):
         # Adiciona um ficheiro a um nodo com os fragmentos inicializados a falso
-        if node_id not in self.contents:
-            self.addNode(node_id)
+        
+        self.addNode(node_id)
         
         for newFile in body:    
             self.contents[node_id][newFile] = body[newFile] 
