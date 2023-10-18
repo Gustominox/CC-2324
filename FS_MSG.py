@@ -47,12 +47,11 @@ class FS_Msg:
         return out
 
     def read_message(self, data):
-        # print(f"DATA IN MSG: {data}")
         
 
         for field in data.split(";"):
             element = field.split("=")
-            # print(element)
+
             if element[0] == "SENDER_ID":
                 self.SENDER_ID = element[1]
             if element[0] == "SENDER_IP":
