@@ -29,6 +29,22 @@ class FS_Msg:
         out += "}"
 
         return out
+    
+    def toText(self):
+        out = ""
+        out += F"SENDER_ID={self.SENDER_ID};\n"
+        out += F"SENDER_IP={self.SENDER_IP};\n"
+        out += F"MSG_TYPE={self.MSG_TYPE};\n"
+        out += "BODY={\n"
+        for file in self.BODY:
+            fragments = "["
+            for frag in self.BODY[file][1]:
+                if frag: fragments += "1"
+                else: fragments += "0"
+            fragments += "]"
+            out += f"{file} {self.BODY[file][0]} {fragments},\n"
+        out += "};"
+        return out
 
     def read_message(self, data):
         # print(f"DATA IN MSG: {data}")
@@ -45,19 +61,22 @@ class FS_Msg:
                 self.MSG_TYPE = element[1]
             elif element[0] == "BODY":
                 bodyLines = element[1].strip("\{\} ").split(",")
+                print(f"BODYLINES: {bodyLines}")
                 
                 for line in bodyLines:
-                    elems = line.split(" ")
+                    if line != "":
+                        elems = line.split(" ")
+                        
+                        nodeId = elems[0]
+                        fileSize = int(elems[1])
+                        fragments = []
+                        for char in elems[2]:
+                            if char == "0": fragments.append(False)
+                            elif char == "1": fragments.append(True)
+                            else: pass 
+                            
+                        self.BODY[nodeId] = [fileSize,fragments]
                     
-                    nodeId = elems[0]
-                    fileSize = int(elems[1])
-                    fragments = []
-                    for char in elems[2]:
-                        if char == "0": fragments.append(False)
-                        elif char == "1": fragments.append(True)
-                        else: pass 
-                          
-                    self.BODY[nodeId] = [fileSize,fragments]
 
             else:
                 pass

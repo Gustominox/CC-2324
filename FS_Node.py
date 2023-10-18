@@ -26,6 +26,8 @@ MSG_TYPE=END TRACKER;
 
 
 
+
+
 class FS_Node:
 
     def __init__(self, port=9090):
@@ -67,7 +69,26 @@ class FS_Node:
 
         print("CLOSING SOCKET")
 
+    def sendTcpMsgFromFile(self,file):
+
+        #using replace() everything is returned in one line.
+        with open(sys.argv[2], 'r') as file:
+            msg = file.read()# .replace('\n',' ')
+
+        soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
+                            socket.SOCK_STREAM)  # Connection-Oriented (TCP PROTOCOL)
+        try:
+            soc.connect((self.endereco, self.porta))
+            print(msg)
+            
+            soc.sendall(msg.encode('utf-8'))
+        except:
+            print("Impossivel Conectar")
         
+        soc.close()
+
+        print("CLOSING SOCKET")
+    
     def askForList(self):
         soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
                             socket.SOCK_STREAM)  # Connection-Oriented (TCP PROTOCOL)
@@ -90,10 +111,12 @@ def main():
 
     
     node = FS_Node()
+    
+    
     if sys.argv[1] == "FILES LIST":
         node.askForList()
     elif sys.argv[1] == "UPDATE NODE":
-        node.sendTcpMsg(messageUpdate)
+        node.sendTcpMsgFromFile(sys.argv[2])
     elif sys.argv[1] == "END TRACKER":
         node.sendTcpMsg(messageEnd)
     else:
