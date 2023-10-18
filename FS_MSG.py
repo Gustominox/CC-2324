@@ -48,7 +48,7 @@ class FS_Msg:
 
     def read_message(self, data):
         # print(f"DATA IN MSG: {data}")
-        print(f"DATA: {data}")
+        
 
         for field in data.split(";"):
             element = field.split("=")
@@ -61,7 +61,6 @@ class FS_Msg:
                 self.MSG_TYPE = element[1]
             elif element[0] == "BODY":
                 bodyLines = element[1].strip("\{\} ").split(",")
-                print(f"BODYLINES: {bodyLines}")
                 
                 for line in bodyLines:
                     if line != "":
