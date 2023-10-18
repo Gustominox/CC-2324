@@ -14,25 +14,10 @@ class FS_Tracker:
 
 
 
-        self.entrys = []
         self.table = FS_Table()
         self.hostname = socket.gethostname()
         self.endereco = socket.gethostbyname(self.hostname)  
         self.porta = port
-        
-    # def FS_TRACK_PROTOCOL(self,soc):
-    #     logging.info("Thread: Listening for node tcp message")
-    #     connection, address = soc.accept() 
-    #     # ler a msg q o node envia
-        
-    #     while True:
-    #         data = connection.recv(1024)
-    #         if not data:
-    #             break
-    #         line = data.decode('utf-8')
-    #         self.entrys.append(line)
-    #         # print(f"RECEIVED: \"{line}\" ")
-    #     logging.info("Thread: Ended node tcp message")
         
     
     def startEntryControl(self):
@@ -61,7 +46,7 @@ class FS_Tracker:
             elif message.MSG_TYPE == "DELETE NODE":
                 continue
             elif message.MSG_TYPE == "FILES LIST":
-                connection.send(str(self.entrys).encode())
+                connection.send()
                 continue
             elif message.MSG_TYPE == "END TRACKER":
                 soc.close()
@@ -86,12 +71,10 @@ def main():
         tracker = FS_Tracker(int(sys.argv[1]))
     else:
         tracker = FS_Tracker()
-    tracker.entrys.append("DEFAULT ENTRY")
     tcp = threading.Thread(target=tracker.startEntryControl)
     tcp.start()
     
     tcp.join()
-    print(tracker.entrys)
     logging.info("ENDED NORMAL EXECUTION")
 
     
