@@ -29,9 +29,8 @@ class FS_Table:
             self.contents[node_id] = {}
         return node_id
 
-    def addFile(self, node_id, file_id, body):
-        # Adiciona um ficheiro a um nodo com os fragmentos inicializados a falso
-        
+    def updateNode(self, node_id, body):
+        # Adiciona um node e a info dos ficheiros nele contidos        
         self.addNode(node_id)
         
         for newFile in body:    
@@ -79,12 +78,14 @@ class FS_Table:
                     nodes_with_fragment.append(node_id)
         return nodes_with_fragment
 
-    def getNodesWithFilename(self, filename):
+    def getNodesWithFilename(self, body):
         # Verifica os nodos que têm um ficheiro
-        nodes_with_filename = []
-        for node_id, files in self.contents.items():
-            if filename in files:
-                nodes_with_filename.append(node_id)
+        nodes_with_filename = {}
+        for search_file in body:
+            for node_id, files in self.contents.items():
+                if search_file in files:
+                    nodes_with_filename[node_id] = files[search_file]
+        
         return nodes_with_filename
 
     def getContents(self):
