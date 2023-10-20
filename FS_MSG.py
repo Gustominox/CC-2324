@@ -4,7 +4,7 @@ class FS_Msg:
         self.SENDER_ID = "NO VALUE"  
         self.SENDER_IP = "NO VALUE"  
         self.MSG_TYPE = "NO VALUE"
-        self.BODY = {}
+        self.BODY = {} # Only used for MSG_TYPE=UPDATE NODE
 
     def __str__(self):
 
