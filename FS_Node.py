@@ -46,7 +46,7 @@ class FS_Node:
     def sendTcpMsgFromFile(self,file):
 
         #using replace() everything is returned in one line.
-        with open(sys.argv[2], 'r') as file:
+        with open(sys.argv[1], 'r') as file:
             msg = file.read()# .replace('\n',' ')
 
         soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
@@ -87,7 +87,7 @@ def main():
     node = FS_Node()
     
     
-    node.sendTcpMsgFromFile(sys.argv[2])
+    node.sendTcpMsgFromFile(sys.argv[1])
     
 
 if __name__ == "__main__":
