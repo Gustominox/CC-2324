@@ -31,10 +31,9 @@ class FS_Tracker:
             connection, address = soc.accept() # Diferenciar que tipo de msg o node esta a enviar
             data = connection.recv(1024)
             msg = data.decode('utf-8')
-            pckg = self.tcpDecode(msg)
             
             message = FS_Msg()
-            message.read_message(pckg)
+            message.read_message(msg)
             
             if message.MSG_TYPE == "UPDATE NODE":
                 logging.info("Received update request")
@@ -54,12 +53,6 @@ class FS_Tracker:
             else:
                 logging.error(f"INVALID MESSAGE FROM NODE: {message.MSG_TYPE}")
     
-    def tcpDecode(self,msg):
-        pckg = ""
-        for line in msg.split('\n'):
-            if not (line == '' or line[0] == '#' ):
-                pckg += line
-        return pckg 
             
         
         
