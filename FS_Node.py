@@ -1,32 +1,6 @@
 import socket
 import sys
 
-messageUpdate = """
-# NODE_ID 
-SENDER_ID=LegionGusto;
-# NODE_IP 
-SENDER_IP=127.0.0.1;
-# HEADER
-MSG_TYPE=UPDATE NODE;
-# BODY
-BODY={
-FILE1 128 [00000],
-FILE2 0 [11111],
-FILE3 512 [10110]
-};"""
-
-messageEnd = """
-# NODE_ID 
-SENDER_ID=LegionGusto;
-# NODE_IP 
-SENDER_IP=127.0.0.1;
-# HEADER
-MSG_TYPE=END TRACKER;
-"""
-
-
-
-
 
 class FS_Node:
 
@@ -113,13 +87,8 @@ def main():
     node = FS_Node()
     
     
-    if sys.argv[1] == "FILES LIST":
-        node.askForList()
-    elif sys.argv[1] == "UPDATE NODE":
-        node.sendTcpMsgFromFile(sys.argv[2])
-    else:
-        print("ERROR: Unknown command")
-
+    node.sendTcpMsgFromFile(sys.argv[2])
+    
 
 if __name__ == "__main__":
     main()
