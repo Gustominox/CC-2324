@@ -37,15 +37,18 @@ class FS_Tracker:
             
             if message.MSG_TYPE == "UPDATE NODE":
                 logging.info("Received update request")
-                self.table.addFile(message.SENDER_ID,message.SENDER_ID,message.BODY)
+                self.table.updateNode(message.SENDER_ID,message.BODY)
 
                 # logging.info(f"MESSAGE RECEIVED: \n{message.toText()}")
                 
                 print(self.table)
             elif message.MSG_TYPE == "DELETE NODE":
                 continue
-            elif message.MSG_TYPE == "FILES LIST":
-                connection.send()
+            elif message.MSG_TYPE == "ASK FILE":
+                
+                node_list = self.table.getNodesWithFilename(message.BODY)
+                print(f"NODE LIST: \n{node_list}")
+                connection.send(f"{node_list}".encode('utf-8'))
                 continue
             elif message.MSG_TYPE == "END TRACKER":
                 soc.close()
