@@ -1,5 +1,6 @@
 import socket
 import sys
+from FS_MSG import FS_Msg
 
 
 class FS_Node:
@@ -16,13 +17,13 @@ class FS_Node:
 
         soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
                             socket.SOCK_STREAM)  # Connection-Oriented (TCP PROTOCOL)
-
+        
         try:
             soc.connect((self.endereco, self.porta))
             soc.sendall(message.encode('utf-8'))
         except:
             print("Impossivel Conectar")
-
+            return
         soc.close()
 
         print("CLOSING SOCKET")
@@ -33,7 +34,6 @@ class FS_Node:
                             socket.SOCK_STREAM)  # Connection-Oriented (TCP PROTOCOL)
         try:
             soc.connect((self.endereco, self.porta))
-            print(msg)
             
             soc.sendall(msg.encode('utf-8'))
         except:
@@ -53,11 +53,22 @@ class FS_Node:
                             socket.SOCK_STREAM)  # Connection-Oriented (TCP PROTOCOL)
         try:
             soc.connect((self.endereco, self.porta))
-            print(msg)
-            
+            message = FS_Msg()
+            message.read_message(msg)
+         
             soc.sendall(msg.encode('utf-8'))
         except:
             print("Impossivel Conectar")
+            return
+            
+        if message.MSG_TYPE == "ASK FILE":
+
+            msg = soc.recv(1024)
+            line = msg.decode('utf-8')
+            print(line)
+        
+        else: 
+            pass
         
         soc.close()
 
