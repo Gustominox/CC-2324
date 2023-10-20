@@ -63,22 +63,34 @@ class FS_Msg:
             elif element[0] == "MSG_TYPE":
                 self.MSG_TYPE = element[1]
             elif element[0] == "BODY":
+                
                 bodyLines = element[1].strip("\{\} ").split(",")
                 
-                for line in bodyLines:
-                    if line != "":
-                        elems = line.split(" ")
-                        
-                        nodeId = elems[0]
-                        fileSize = int(elems[1])
-                        fragments = []
-                        for char in elems[2]:
-                            if char == "0": fragments.append(False)
-                            elif char == "1": fragments.append(True)
-                            else: pass 
+                if self.MSG_TYPE == "UPDATE NODE":
+                                            
+                    for line in bodyLines:
+                        if line != "":
+                            elems = line.split(" ")
                             
-                        self.BODY[nodeId] = [fileSize,fragments]
+                            nodeId = elems[0]
+                            fileSize = int(elems[1])
+                            fragments = []
+                            for char in elems[2]:
+                                if char == "0": fragments.append(False)
+                                elif char == "1": fragments.append(True)
+                                else: pass 
+                                
+                            self.BODY[nodeId] = [fileSize,fragments]
+                            
+                elif self.MSG_TYPE == "ASK FILE":
+                    for line in bodyLines:
+                        self.BODY[line] = "NONE"
+                else:
+                    pass
                     
+                    
+                    
+                         
 
             else:
                 pass
