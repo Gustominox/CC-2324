@@ -82,9 +82,10 @@ class FS_Table:
         # Verifica os nodos que têm um ficheiro
         nodes_with_filename = {}
         for search_file in body:
+            nodes_with_filename[search_file] = []
             for node_id, files in self.contents.items():
                 if search_file in files:
-                    nodes_with_filename[node_id] = files[search_file]
+                    nodes_with_filename[search_file].append( (node_id,files[search_file]))
         
         return nodes_with_filename
 
