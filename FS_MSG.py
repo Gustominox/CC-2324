@@ -1,10 +1,17 @@
 import json
 class FS_Msg:
-    def __init__(self):
-        self.SENDER_ID = "NO VALUE"  
-        self.SENDER_IP = "NO VALUE"  
-        self.MSG_TYPE = "NO VALUE"
-        self.BODY = {} # Only used for MSG_TYPE=UPDATE NODE
+    def __init__(self,
+        SENDER_ID = "NO VALUE",  
+        SENDER_IP = "NO VALUE",  
+        MSG_TYPE = "NO VALUE",
+        BODY = {} # Only used for MSG_TYPE=UPDATE NODE
+        ):
+        
+        self.SENDER_ID  = SENDER_ID
+        self.SENDER_IP  = SENDER_IP  
+        self.MSG_TYPE   = MSG_TYPE
+        self.BODY       = BODY
+        
 
     def __str__(self):
 
