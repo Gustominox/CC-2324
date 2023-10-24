@@ -20,14 +20,8 @@ class FS_Tracker:
         self.porta = port
         
     
-    def startEntryControl(self):
-        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def startEntryControl(self,connection, address):
         
-        soc.bind(('', self.porta))            
-        soc.listen()
-        connection, address = soc.accept() 
-        
-
         while True:
             
             data = connection.recv(1024)
@@ -56,11 +50,10 @@ class FS_Tracker:
                 connection.send(f"{node_list}".encode('utf-8'))
                 
             elif message.MSG_TYPE == "END TRACKER":
-                soc.close()
-                break
+                pass
             else:
                 logging.error(f"INVALID MESSAGE FROM NODE: {message.MSG_TYPE}")
-    
+
             
         
         
@@ -72,10 +65,19 @@ def main():
         tracker = FS_Tracker(int(sys.argv[1]))
     else:
         tracker = FS_Tracker()
-    tcp = threading.Thread(target=tracker.startEntryControl)
-    tcp.start()
+        
     
-    tcp.join()
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+    soc.bind(('', tracker.porta))            
+    soc.listen()
+    
+
+    while True:
+        connection, address = soc.accept() 
+        tcp = threading.Thread(target=tracker.startEntryControl,args=(connection, address))
+        tcp.start()
+        
     logging.info("ENDED NORMAL EXECUTION")
 
     
