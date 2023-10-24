@@ -79,7 +79,7 @@ class FS_Msg:
             elif element[0] == "MSG_TYPE":
                 self.MSG_TYPE = element[1]
             elif element[0] == "BODY":
-                
+                self.BODY = {}
                 bodyLines = element[1].strip("\{\} ").split(",")
                 
                 if self.MSG_TYPE == "UPDATE NODE":

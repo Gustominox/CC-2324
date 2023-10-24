@@ -64,9 +64,10 @@ class FS_Node:
     def sendTcpMsg(self,msg):
 
         message = msg.toText()
-        print(message)
+        
 
         try:
+            print(f"Sending: {message}")
             self.soc.sendall(message.encode('utf-8'))
         except:
             print("Impossivel Conectar")
