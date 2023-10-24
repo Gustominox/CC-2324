@@ -61,7 +61,7 @@ class FS_Tracker:
 def main():
     format = "%(asctime)s: %(message)s"
     logging.basicConfig(format=format, level=logging.INFO)
-    if sys.argv[1]:
+    if len(sys.argv) > 1:
         tracker = FS_Tracker(int(sys.argv[1]))
     else:
         tracker = FS_Tracker()
