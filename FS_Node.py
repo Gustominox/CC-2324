@@ -41,26 +41,7 @@ class FS_Node:
         
         self.nodeId = f"{self.endereco}"
         self.contents={}
-
-    def adicionaFicheiroCompleto(self,file): #Adicionar o SHA-256 aqui
-        self.contents[file]=file
-        self.contents[file]#adicionar aqui os 20 fragmentos a TRUE
-        
-    def updateEntrys(self):
-
-        soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
-                            socket.SOCK_STREAM)  # Connection-Oriented (TCP PROTOCOL)
-        
-        try:
-            soc.connect((self.endereco, self.porta))
-            soc.sendall(message.encode('utf-8'))
-        except:
-            print("Impossivel Conectar")
-            return
-        soc.close()
-
-        print("CLOSING SOCKET")
-    
+          
     def sendTcpMsg(self,msg):
 
         message = msg.toText()
@@ -83,55 +64,7 @@ class FS_Node:
             pass
         
 
-        print("CLOSING SOCKET")
-
-    def sendTcpMsgFromFile(self,filePath):
-
-        #using replace() everything is returned in one line.
-        with open(filePath, 'r') as file:
-            msg = file.read()# .replace('\n',' ')
-        
-        try:
-
-            message = FS_Msg()
-            message.read_message(msg)
-            print(message)
-            self.soc.sendall(msg.encode('utf-8'))
-        except:
-            print("Impossivel Conectar")
-            return
-            
-        if message.MSG_TYPE == "ASK FILE":
-
-            msg = self.soc.recv(1024)
-            line = msg.decode('utf-8')
-            print(line)
-        
-        else: 
-            pass
-        
-
-        print("CLOSING SOCKET")
     
-    
-    
-    
-    def askForList(self):
-        soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
-                            socket.SOCK_STREAM)  # Connection-Oriented (TCP PROTOCOL)
-
-        try:
-            soc.connect((self.endereco, self.porta))
-            soc.sendall("FILES LIST".encode('utf-8'))
-        except:
-            print("Impossivel Conectar")
-
-        msg = soc.recv(1024)
-        line = msg.decode('utf-8')
-        print(line)
-        soc.close()
-
-        print("CLOSING SOCKET")
     def createMsg(self,MSG_TYPE,BODY={}):
                     
         if MSG_TYPE == "UPDATE NODE":
@@ -146,6 +79,7 @@ class FS_Node:
         with open(filePath, 'rb') as file:
             data = file.read()# .replace('\n',' ')
 
+        #TODO support various fragSizes, increase depending on file size
         fragSize = 8
         
         fileSize = len(data)
@@ -156,9 +90,11 @@ class FS_Node:
         
         print(lastFragSize)
                
-        
+        #TODO em vez de usar path Adicionar o SHA-256 aqui para ser o fich id
         self.contents[filePath] = [fileSize,[True] * numFrags]
+    
 
+    
 def main():
 
     if len(sys.argv) > 1:
