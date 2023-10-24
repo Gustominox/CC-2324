@@ -11,16 +11,13 @@ class FS_Tracker:
     def __init__(self, port = 9090):
 
         # self.startTime = datetime.now()
-
-
-
         self.table = FS_Table()
         self.hostname = socket.gethostname()
         self.endereco = socket.gethostbyname(self.hostname)  
         self.porta = port
         
     
-    def startEntryControl(self,connection, address):
+    def launchTcpConnection(self,connection, address):
         
         while True:
             
@@ -34,14 +31,10 @@ class FS_Tracker:
                 self.table.updateNode(message.SENDER_ID,message.BODY)
                 logging.info(f"UPDATE: {message.SENDER_ID}")
 
-                # logging.info(f"MESSAGE RECEIVED: \n{message.toText()}")
-                
-                print(self.table)
             elif message.MSG_TYPE == "DELETE NODE":
                 
                 self.table.removeNode(message.SENDER_ID)
                 logging.info(f"REMOVE: {message.SENDER_ID}")
-                # print(self.table)
                 
             elif message.MSG_TYPE == "ASK FILE":
                 
@@ -75,7 +68,7 @@ def main():
 
     while True:
         connection, address = soc.accept() 
-        tcp = threading.Thread(target=tracker.startEntryControl,args=(connection, address))
+        tcp = threading.Thread(target=tracker.launchTcpConnection,args=(connection, address))
         tcp.start()
         
     logging.info("ENDED NORMAL EXECUTION")
