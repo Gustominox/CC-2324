@@ -22,31 +22,34 @@ class FS_Tracker:
         while True:
             
             data = connection.recv(1024)
-            msg = data.decode('utf-8')
-            
-            message = FS_Msg()
-            message.read_message(msg)
-            
-            if message.MSG_TYPE == "UPDATE NODE":
-                self.table.updateNode(message.SENDER_ID,message.BODY)
-                logging.info(f"UPDATE: {message.SENDER_ID}")
+            if data:
+                msg = data.decode('utf-8')
+                
+                message = FS_Msg()
+                message.read_message(msg)
+                
+                if message.MSG_TYPE == "UPDATE NODE":
+                    self.table.updateNode(message.SENDER_ID,message.BODY)
+                    logging.info(f"UPDATE: {message.SENDER_ID}")
 
-            elif message.MSG_TYPE == "DELETE NODE":
-                
-                self.table.removeNode(message.SENDER_ID)
-                logging.info(f"REMOVE: {message.SENDER_ID}")
-                
-            elif message.MSG_TYPE == "ASK FILE":
-                
-                node_list = self.table.getNodesWithFilename(message.BODY)
-                print(f"NODE LIST: \n{node_list}")
-                connection.send(f"{node_list}".encode('utf-8'))
-                
-            elif message.MSG_TYPE == "END TRACKER":
-                pass
+                elif message.MSG_TYPE == "DELETE NODE":
+                    
+                    self.table.removeNode(message.SENDER_ID)
+                    logging.info(f"REMOVE: {message.SENDER_ID}")
+                    
+                elif message.MSG_TYPE == "ASK FILE":
+                    
+                    node_list = self.table.getNodesWithFilename(message.BODY)
+                    print(f"NODE LIST: \n{node_list}")
+                    connection.send(f"{node_list}".encode('utf-8'))
+                    
+                elif message.MSG_TYPE == "END TRACKER":
+                    pass
+                else:
+                    logging.error(f"INVALID MESSAGE FROM NODE: {message.MSG_TYPE}")
             else:
-                logging.error(f"INVALID MESSAGE FROM NODE: {message.MSG_TYPE}")
-
+                logging.info(f"Closing connection {address}")
+                break
             
         
         
