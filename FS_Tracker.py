@@ -25,10 +25,11 @@ class FS_Tracker:
         
         soc.bind(('', self.porta))            
         soc.listen()
+        connection, address = soc.accept() 
+        
 
         while True:
             
-            connection, address = soc.accept() 
             data = connection.recv(1024)
             msg = data.decode('utf-8')
             
