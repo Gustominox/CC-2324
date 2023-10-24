@@ -54,12 +54,12 @@ class FS_Table:
     #     if node_id in self.contents and file_id in self.contents[node_id]:
     #         del self.contents[node_id][file_id]
 
-    # def removeNode(self, node_id):
-    #     # Remove a node and all its associated information from the table
-    #     if node_id in self.contents:
-    #         del self.contents[node_id]
-    #     # if node_id in self.node_addresses:
-    #     #     del self.node_addresses[node_id]
+    def removeNode(self, node_id):
+        # Remove a node and all its associated information from the table
+        if node_id in self.contents:
+            del self.contents[node_id]
+        # if node_id in self.node_addresses:
+        #     del self.node_addresses[node_id]
 
     # def getFragmentStatus(self, node_id, file_id):
     #     # Verifica o estado de fragmentos de um ficheiro (Para verificação manual?)

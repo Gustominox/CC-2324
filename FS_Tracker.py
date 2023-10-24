@@ -28,7 +28,7 @@ class FS_Tracker:
 
         while True:
             
-            connection, address = soc.accept() # Diferenciar que tipo de msg o node esta a enviar
+            connection, address = soc.accept() 
             data = connection.recv(1024)
             msg = data.decode('utf-8')
             
@@ -36,20 +36,24 @@ class FS_Tracker:
             message.read_message(msg)
             
             if message.MSG_TYPE == "UPDATE NODE":
-                logging.info("Received update request")
                 self.table.updateNode(message.SENDER_ID,message.BODY)
+                logging.info(f"UPDATE: {message.SENDER_ID}")
 
                 # logging.info(f"MESSAGE RECEIVED: \n{message.toText()}")
                 
                 print(self.table)
             elif message.MSG_TYPE == "DELETE NODE":
-                continue
+                
+                self.table.removeNode(message.SENDER_ID)
+                logging.info(f"REMOVE: {message.SENDER_ID}")
+                # print(self.table)
+                
             elif message.MSG_TYPE == "ASK FILE":
                 
                 node_list = self.table.getNodesWithFilename(message.BODY)
                 print(f"NODE LIST: \n{node_list}")
                 connection.send(f"{node_list}".encode('utf-8'))
-                continue
+                
             elif message.MSG_TYPE == "END TRACKER":
                 soc.close()
                 break
