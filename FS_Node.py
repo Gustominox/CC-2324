@@ -144,9 +144,9 @@ class FS_Node:
     def addFile(self,filePath):
         
         # TODO only supports UTF-8 type files 
-        with open(filePath, 'r') as file:
+        with open(filePath, 'rb') as file:
             data = file.read()# .replace('\n',' ')
-        
+
         fragSize = 8
         
         fileSize = len(data)
