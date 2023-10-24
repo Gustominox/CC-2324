@@ -1,9 +1,11 @@
 import socket
 import sys
+import json
 from FS_MSG import FS_Msg
 
 
 class FS_Node:
+
 
     def __init__(self, port=9090):
 
@@ -12,7 +14,13 @@ class FS_Node:
         self.hostname = socket.gethostname()
         self.endereco = socket.gethostbyname(self.hostname)
         self.porta = port
+        self.nodeId = f"{self.endereco}"
+        self.contents={}
 
+    def adicionaFicheiroCompleto(self,file): #Adicionar o SHA-256 aqui
+        self.contents[file]=file
+        self.contents[file]#adicionar aqui os 20 fragmentos a TRUE
+        
     def updateEntrys(self):
 
         soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
