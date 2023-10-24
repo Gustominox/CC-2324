@@ -70,10 +70,10 @@ class FS_Node:
             print("Impossivel Conectar")
             return
             
-        if message.MSG_TYPE == "ASK FILE":
+        if msg.MSG_TYPE == "ASK FILE":
 
-            msg = self.soc.recv(1024)
-            line = msg.decode('utf-8')
+            message = self.soc.recv(1024)
+            line = message.decode('utf-8')
             print(line)
         
         else: 
@@ -133,17 +133,31 @@ class FS_Node:
         
         if MSG_TYPE == "UPDATE NODE":
             body = {}
-            # for file in dicti:
-            #     #create line FILE SIZE [SEGS]
-            #     # add to body        
-            #     continue
             
             # TODO only for quick debug
-            body = cont        
+            body = self.contents
+                    
         msg =  FS_Msg(self.hostname,self.endereco,MSG_TYPE,body)
         
         return msg
+    def addFile(self,filePath):
         
+        
+        with open(filePath, 'r') as file:
+            data = file.read()# .replace('\n',' ')
+        
+        fragSize = 8
+        
+        fileSize = len(data)
+        
+        numFrags = int(fileSize / fragSize)
+        
+        lastFragSize = fileSize - (numFrags * fragSize)
+        
+        print(lastFragSize)
+               
+        
+        self.contents[filePath] = [fileSize,[True] * numFrags]
 
 def main():
 
@@ -156,23 +170,36 @@ def main():
     
     
     while True:
+        print("Node > ",end="")
+        
         option = input()
         if option == "update":
-            file = input()
+            
             msg = node.createMsg("UPDATE NODE")
             node.sendTcpMsg(msg)
             
         elif option == "ask":
             file = input()
             node.sendTcpMsgFromFile(file)
+            
+        elif option == "add":
+            print("Insert File > ",end="")
+            filePath = input()
+            node.addFile(filePath)
+
+        elif option == "list":
+        
+            print(json.dumps(node.contents, indent=4))
+
+            
         elif option == "exit":
         
             soc.close()
             logging.info("Terminate normal execution")
-            
+        
         else:
             logging.info("Unknown Option")        
-    
+            
 
 if __name__ == "__main__":
     main()
