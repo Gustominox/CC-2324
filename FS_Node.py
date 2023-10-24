@@ -162,7 +162,7 @@ class FS_Node:
 def main():
 
     
-    node = FS_Node(9091) # TODO port in argv
+    node = FS_Node(9090) # TODO port in argv
     node.addFile("askFile.msg")
     msg = node.createMsg("UPDATE NODE")
     node.sendTcpMsg(msg)
