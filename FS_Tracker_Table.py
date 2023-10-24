@@ -78,6 +78,7 @@ class FS_Table:
     #                 nodes_with_fragment.append(node_id)
     #     return nodes_with_fragment
 
+    #BUG esta funcao nao esta a retornar os valores corretos 
     def getNodesWithFilename(self, body):
         # Verifica os nodos que têm os ficheiros referenciados na msg
         nodes_with_filename = {}
