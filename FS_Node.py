@@ -162,8 +162,11 @@ class FS_Node:
 
 def main():
 
+    if len(sys.argv) > 1:
+        node = FS_Node(int(sys.argv[1]))        
+    else:
+        node = FS_Node()
     
-    node = FS_Node(9090) # TODO port in argv
     node.addFile("askFile.msg")
     msg = node.createMsg("UPDATE NODE")
     node.sendTcpMsg(msg)
