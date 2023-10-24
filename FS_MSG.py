@@ -43,14 +43,23 @@ class FS_Msg:
         out += F"SENDER_IP={self.SENDER_IP};\n"
         out += F"MSG_TYPE={self.MSG_TYPE};\n"
         out += "BODY={\n"
-        for file in self.BODY:
-            fragments = "["
-            for frag in self.BODY[file][1]:
-                if frag: fragments += "1"
-                else: fragments += "0"
-            fragments += "]"
-            out += f"{file} {self.BODY[file][0]} {fragments},\n"
-        out += "};"
+        if self.MSG_TYPE == "UPDATE NODE":
+            for file in self.BODY:
+                fragments = "["
+                for frag in self.BODY[file][1]:
+                    if frag: fragments += "1"
+                    else: fragments += "0"
+                fragments += "]"
+                out += f"{file} {self.BODY[file][0]} {fragments},\n"
+            out += "};"
+        elif self.MSG_TYPE == "ASK FILE":
+            askingList = ""
+            for file in self.BODY:
+                askingList += f"{file},\n"
+            out += askingList
+            out += "};" 
+        else:
+            out += "};" 
         return out
 
     def read_message(self, data):
@@ -91,7 +100,8 @@ class FS_Msg:
                             
                 elif self.MSG_TYPE == "ASK FILE":
                     for line in bodyLines:
-                        self.BODY[line] = "NONE"
+                        if line != "":
+                            self.BODY[line] = "NONE"
                 else:
                     pass
                     
