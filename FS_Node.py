@@ -63,8 +63,10 @@ class FS_Node:
     
     def sendTcpMsg(self,msg):
 
+        message = msg.toText()
+        print(message)
+
         try:
-            message = msg.toText()
             self.soc.sendall(message.encode('utf-8'))
         except:
             print("Impossivel Conectar")
@@ -129,20 +131,18 @@ class FS_Node:
         soc.close()
 
         print("CLOSING SOCKET")
-    def createMsg(self,MSG_TYPE):
-        
-        if MSG_TYPE == "UPDATE NODE":
-            body = {}
-            
-            # TODO only for quick debug
-            body = self.contents
+    def createMsg(self,MSG_TYPE,BODY={}):
                     
-        msg =  FS_Msg(self.hostname,self.endereco,MSG_TYPE,body)
+        if MSG_TYPE == "UPDATE NODE":
+            BODY = self.contents
+
+        msg =  FS_Msg(self.hostname,self.endereco,MSG_TYPE,BODY)
         
         return msg
+    
     def addFile(self,filePath):
         
-        
+        # TODO only supports UTF-8 type files 
         with open(filePath, 'r') as file:
             data = file.read()# .replace('\n',' ')
         
@@ -162,8 +162,11 @@ class FS_Node:
 def main():
 
     
-    node = FS_Node()
-    
+    node = FS_Node(9091) # TODO port in argv
+    node.addFile("askFile.msg")
+    msg = node.createMsg("UPDATE NODE")
+    node.sendTcpMsg(msg)
+
     
     format = "%(asctime)s: %(message)s"
     logging.basicConfig(format=format, level=logging.INFO)
@@ -180,7 +183,10 @@ def main():
             
         elif option == "ask":
             file = input()
-            node.sendTcpMsgFromFile(file)
+
+            BODY = {file : "NONE"}
+            msg = node.createMsg("ASK FILE",BODY)
+            node.sendTcpMsg(msg)
             
         elif option == "add":
             print("Insert File > ",end="")
@@ -194,8 +200,9 @@ def main():
             
         elif option == "exit":
         
-            soc.close()
+            node.soc.close()
             logging.info("Terminate normal execution")
+            break
         
         else:
             logging.info("Unknown Option")        
