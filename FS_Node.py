@@ -2,6 +2,7 @@ import socket
 import sys
 import logging
 import json
+import hashlib
 from FS_MSG import FS_Msg
 
 
@@ -71,6 +72,8 @@ class FS_Node:
 
         with open(filePath, 'rb') as file:
             data = file.read()  # .replace('\n',' ')
+            hash256 = hashlib.sha256(data).hexdigest()
+            # TODO: add name to hash 
 
         # TODO: support various fragSizes, increase depending on file size
         # Size 1MB > - fragSize 1 B - 8 bits
@@ -88,8 +91,7 @@ class FS_Node:
 
         print(lastFragSize)
 
-        # TODO: em vez de usar path Adicionar o SHA-256 aqui para ser o fich id
-        self.contents[filePath] = [fileSize, [True] * numFrags]
+        self.contents[hash256] = [fileSize, [True] * numFrags]
 
 
 def main():
