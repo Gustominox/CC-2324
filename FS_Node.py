@@ -33,7 +33,7 @@ class FS_Node:
         self.soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
                             socket.SOCK_STREAM)  # Connection-Oriented (TCP PROTOCOL)
 
-        self.hostname = socket.gethostname()
+        self.hostname = socket.gethostname() #TODO: host name in cli, resolve with /etc/hosts
         self.endereco = socket.gethostbyname(self.hostname)
         self.porta = port
         

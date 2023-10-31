@@ -20,7 +20,7 @@ class FS_Tracker:
     def launchTcpConnection(self,connection, address):
         
         while True:
-            
+            # TODO: delimit message, msg could be bigger than 1024 bits
             data = connection.recv(1024)
             if data:
                 msg = data.decode('utf-8')
