@@ -36,7 +36,6 @@ class FS_Node:
         self.hostname = socket.gethostname() #TODO: host name in cli, resolve with /etc/hosts
         self.endereco = socket.gethostbyname(self.hostname)
         self.porta = port
-        
         self.soc.connect((self.endereco, self.porta))
         
         self.nodeId = f"{self.endereco}"
@@ -115,6 +114,7 @@ def main():
         print("Node > ",end="")
         
         option = input()
+        
         if option == "update":
             
             msg = node.createMsg("UPDATE NODE")
@@ -139,6 +139,7 @@ def main():
             
         elif option == "exit":
         
+            #TODO: needs to send delete node msg before closing
             node.soc.close()
             logging.info("Terminate normal execution")
             break
