@@ -30,7 +30,6 @@ class FS_Node:
         self.soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
                                  socket.SOCK_STREAM)  # Connection-Oriented (TCP PROTOCOL)
 
-        # socket.gethostname() #TODO: host name in cli, resolve with /etc/hosts
         self.hostname = hostname
         self.endereco = socket.gethostbyname(self.hostname)
         self.porta = port
@@ -130,7 +129,8 @@ def main():
 
         elif option == "exit":
 
-            # TODO: needs to send delete node msg before closing
+            msg = node.createMsg("DELETE NODE")
+            node.sendTcpMsg(msg)
             node.soc.close()
             logging.info("Terminate normal execution")
             break
