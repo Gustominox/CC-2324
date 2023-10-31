@@ -72,7 +72,7 @@ class FS_Node:
         with open(filePath, 'rb') as file:
             data = file.read()  # .replace('\n',' ')
 
-        # TODO support various fragSizes, increase depending on file size
+        # TODO: support various fragSizes, increase depending on file size
         fragSize = 8
 
         fileSize = len(data)
@@ -83,7 +83,7 @@ class FS_Node:
 
         print(lastFragSize)
 
-        # TODO em vez de usar path Adicionar o SHA-256 aqui para ser o fich id
+        # TODO: em vez de usar path Adicionar o SHA-256 aqui para ser o fich id
         self.contents[filePath] = [fileSize, [True] * numFrags]
 
 
