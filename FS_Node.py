@@ -76,9 +76,14 @@ class FS_Node:
             # TODO: add name to hash 
 
         # TODO: support various fragSizes, increase depending on file size
-        fragSize = 8
+        # Size 1MB > - fragSize 1 B - 8 bits
+        # Size 1gb > - fragSize 1 MB 
+        
+        
 
         fileSize = len(data)
+
+        fragSize = 8
 
         numFrags = int(fileSize / fragSize)
 
