@@ -129,7 +129,8 @@ def main():
 
         elif option == "exit":
 
-            # TODO: needs to send delete node msg before closing
+            msg = node.createMsg("DELETE NODE")
+            node.sendTcpMsg(msg)
             node.soc.close()
             logging.info("Terminate normal execution")
             break
