@@ -38,7 +38,7 @@ class FS_Msg:
         return out
     
     def toText(self):
-        out = ""
+        out = "("
         out += F"SENDER_ID={self.SENDER_ID};\n"
         out += F"SENDER_IP={self.SENDER_IP};\n"
         out += F"MSG_TYPE={self.MSG_TYPE};\n"
@@ -59,7 +59,8 @@ class FS_Msg:
             out += askingList
             out += "};" 
         else:
-            out += "};" 
+            out += "};"
+        out += ")"
         return out
 
     def read_message(self, data):
@@ -68,6 +69,14 @@ class FS_Msg:
             if not (line == '' or line[0] == '#' ):
                 pckg += line
         
+        
+        if pckg[0] == '(' and pckg[-1] == ')':
+            pckg = pckg[1:-1]
+        else:
+            return False
+            
+            
+                
 
         for field in pckg.split(";"):
             element = field.split("=")
@@ -103,11 +112,8 @@ class FS_Msg:
                         if line != "":
                             self.BODY[line] = "NONE"
                 else:
-                    pass
-                    
-                    
-                    
-                         
-
+                    pass      
             else:
                 pass
+        
+        return True
