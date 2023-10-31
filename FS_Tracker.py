@@ -26,7 +26,7 @@ class FS_Tracker:
                 msg = data.decode('utf-8')
                 
                 message = FS_Msg()
-                message.read_message(msg)
+                fullMessage = message.read_message(msg)
                 
                 if message.MSG_TYPE == "UPDATE NODE":
                     self.table.updateNode(message.SENDER_ID,message.BODY)
