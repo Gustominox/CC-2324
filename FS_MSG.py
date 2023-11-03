@@ -64,21 +64,22 @@ class FS_Msg:
         return out
 
     def read_message(self, data):
-        pckg = ""
-        for line in data.split('\n'):
-            if not (line == '' or line[0] == '#' ):
-                pckg += line
+        # pckg = ""
+        
+        # for line in data.split('\n'):
+        #     if not (line == '' or line[0] == '#' ):
+        #         pckg += line
         
         
-        if pckg[0] == '(' and pckg[-1] == ')':
-            pckg = pckg[1:-1]
+        if data[0] == '(' and data[-1] == ')':
+            data = data[1:-1]
         else:
             return False
             
             
                 
 
-        for field in pckg.split(";"):
+        for field in data.split(";"):
             element = field.split("=")
 
             if element[0] == "SENDER_ID":
