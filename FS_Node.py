@@ -5,22 +5,9 @@ import json
 import hashlib
 from FS_MSG import FS_Msg
 
-
-cont = {
-    "FILE1": [
-        128,
-        [
-            0, 0, 0, 0, 0]
-    ],
-    "FILE2": [
-        0,
-        [0, 0, 0, 0, 0]
-    ],
-    "FILE3": [
-        512,
-        [0, 0, 0, 0, 0]
-    ]
-}
+testMsg = """
+(SENDER_ID=Gusto;SENDER_IP=127.0.1.10;MSG_TYPE=UPDATE NODE;BODY={04d1de24fea21c577347b531727ffe2f0488a6d02582c437c9305ff91fb05d8f 123 [111111111111111],};)
+(SENDER_ID=Gusto;SENDER_IP=127.0.1.10;MSG_TYPE=UPDATE NODE;"""
 
 
 class FS_Node:
@@ -55,6 +42,25 @@ class FS_Node:
             message = self.soc.recv(1024)
             line = message.decode('utf-8')
             print(line)
+
+        else:
+            pass
+
+    def sendTcpString(self, message):
+
+
+        try:
+            print(f"Sending: {message}")
+            self.soc.sendall(message.encode('utf-8'))
+        except:
+            print("Impossivel Conectar")
+            return
+
+        # if msg.MSG_TYPE == "ASK FILE":
+# 
+            # message = self.soc.recv(1024)
+            # line = message.decode('utf-8')
+            # print(line)
 
         else:
             pass
@@ -102,8 +108,8 @@ def main():
         node = FS_Node()
 
     node.addFile("askFile.msg")
-    msg = node.createMsg("UPDATE NODE")
-    node.sendTcpMsg(msg)
+    # msg = node.createMsg("UPDATE NODE")
+    node.sendTcpString(testMsg)
 
     format = "%(asctime)s: %(message)s"
     logging.basicConfig(format=format, level=logging.INFO)
