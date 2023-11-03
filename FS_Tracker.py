@@ -22,7 +22,6 @@ class FS_Tracker:
         msg = ""
         
         while True:
-            # TODO: delimit message is done e preciso receber agora mais que uma mensagem ou seja fazer o parse de "()"
             data = connection.recv(1024)
             logging.info("Received data")
             fullMessage = True
@@ -55,8 +54,8 @@ class FS_Tracker:
                 current_message = pckg[indexStart:indexEnd+1]
                 msg = pckg[indexEnd+1:]
                 
-                print("Received message: " + current_message)
-                print("Leftover data: " + msg)
+                # print("Received message: " + current_message)
+                # print("Leftover data: " + msg)
                 
                 message = FS_Msg()
                 message.read_message(current_message)
