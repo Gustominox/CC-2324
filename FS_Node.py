@@ -108,8 +108,8 @@ def main():
         node = FS_Node()
 
     node.addFile("askFile.msg")
-    # msg = node.createMsg("UPDATE NODE")
-    node.sendTcpString(testMsg)
+    msg = node.createMsg("UPDATE NODE")
+    node.sendTcpMsg(msg)
 
     format = "%(asctime)s: %(message)s"
     logging.basicConfig(format=format, level=logging.INFO)
