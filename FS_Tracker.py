@@ -25,11 +25,41 @@ class FS_Tracker:
             # TODO: delimit message is done e preciso receber agora mais que uma mensagem ou seja fazer o parse de "()"
             data = connection.recv(1024)
             logging.info("Received data")
+            fullMessage = True
+            
             if data:
-                msg += data.decode('utf-8')
+                data_received = data.decode('utf-8')
+                
+                # Cleaning empty lines and comments
+                pckg = ""
+        
+                for line in data_received.split('\n'):
+                    if not (line == '' or line[0] == '#' ):
+                        pckg += line
+                
+                
+                # Checking message delimiters
+                index = 0
+                indexStart = 0
+                indexEnd = 0
+                for char in pckg:
+                    if char == '(': indexStart = index
+                    if char == ')': 
+                        indexEnd   = index
+                        break
+                    index += 1
+                
+                if indexEnd == 0:
+                    fullMessage = False
+                
+                current_message = pckg[indexStart:indexEnd+1]
+                msg = pckg[indexEnd+1:]
+                
+                print("Received message: " + current_message)
+                print("Leftover data: " + msg)
                 
                 message = FS_Msg()
-                fullMessage = message.read_message(msg)
+                message.read_message(current_message)
                 
                 if fullMessage:
                     if message.MSG_TYPE == "UPDATE NODE":
