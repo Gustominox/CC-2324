@@ -5,9 +5,22 @@ import json
 import hashlib
 from FS_MSG import FS_Msg
 
-testMsg = """
-(SENDER_ID=Gusto;SENDER_IP=127.0.1.10;MSG_TYPE=UPDATE NODE;BODY={04d1de24fea21c577347b531727ffe2f0488a6d02582c437c9305ff91fb05d8f 123 [111111111111111],};)
-(SENDER_ID=Gusto;SENDER_IP=127.0.1.10;MSG_TYPE=UPDATE NODE;"""
+
+cont = {
+    "FILE1": [
+        128,
+        [
+            0, 0, 0, 0, 0]  
+    ],
+    "FILE2": [
+        0,
+        [0, 0, 0, 0, 0]
+    ],
+    "FILE3": [
+        512,
+        [0, 0, 0, 0, 0]
+    ]
+}
 
 
 class FS_Node:
@@ -46,24 +59,6 @@ class FS_Node:
         else:
             pass
 
-    def sendTcpString(self, message):
-
-
-        try:
-            print(f"Sending: {message}")
-            self.soc.sendall(message.encode('utf-8'))
-        except:
-            print("Impossivel Conectar")
-            return
-
-        # if msg.MSG_TYPE == "ASK FILE":
-# 
-            # message = self.soc.recv(1024)
-            # line = message.decode('utf-8')
-            # print(line)
-
-        else:
-            pass
 
     def createMsg(self, MSG_TYPE, BODY={}):
 
@@ -79,7 +74,8 @@ class FS_Node:
         with open(filePath, 'rb') as file:
             data = file.read()  # .replace('\n',' ')
             hash256 = hashlib.sha256(data).hexdigest()
-            # TODO: add name to hash 
+            filename = filePath.split("/")[-1]
+            name_hash = [hash256,filename]
 
         # TODO: support various fragSizes, increase depending on file size
         # Size 1MB > - fragSize 1 B - 8 bits
@@ -95,9 +91,9 @@ class FS_Node:
 
         lastFragSize = fileSize - (numFrags * fragSize)
 
-        print(lastFragSize)
+        
 
-        self.contents[hash256] = [fileSize, [True] * numFrags]
+        self.contents[name_hash[1]] = [fileSize, [True] * numFrags, name_hash[0]]
 
 
 def main():
