@@ -56,7 +56,7 @@ O protocolo FS Transfer Protocol deve funcionar sobre UDP e suportar:
 
 Etapas sugeridas para esta fase:
 
-- [ ]Especificar o protocolo FS Transfer Protocol para funcionar sobre UDP
+- [ ] Especificar o protocolo FS Transfer Protocol para funcionar sobre UDP   
   - [ ] Formato dos datagramas
   - [ ] o Modo de funcionamento
 - [ ] Implementação e teste no cenário proposto
