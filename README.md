@@ -53,3 +53,10 @@ O protocolo FS Transfer Protocol deve funcionar sobre UDP e suportar:
 - [ ] Aceitar pedidos de blocos, em paralelo, de múltiplos outros FS_Node
 - [ ] Pedir, em paralelo, blocos do mesmo ficheiro a múltiplos FS_Node
 - [ ] Suportar cenários de perda de blocos, garantindo uma entrega fiável
+
+Etapas sugeridas para esta fase:
+
+- [ ]Especificar o protocolo FS Transfer Protocol para funcionar sobre UDP
+  - [ ] Formato dos datagramas
+  - [ ] o Modo de funcionamento
+- [ ] Implementação e teste no cenário proposto
