@@ -103,7 +103,7 @@ def main():
     else:
         node = FS_Node()
 
-    node.addFile("askFile.msg")
+    node.addFile("../msgs/askFile.msg")
     msg = node.createMsg("UPDATE NODE")
     node.sendTcpMsg(msg)
 
