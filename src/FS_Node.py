@@ -68,6 +68,45 @@ class FS_Node:
         msg = FS_Msg(self.hostname, self.endereco, MSG_TYPE, BODY)
 
         return msg
+    
+    def fragFile(self, filePath, fragSize):
+        
+        fileName = filePath.split("/")[-1]
+        
+        with open(filePath, 'rb') as file:
+            data = file.read()  
+        
+        frag = bytes([])    
+        fragIndex = 0
+        for byte in data:
+            frag += bytes([byte])
+            if len(frag) == fragSize:
+                print(list(frag))
+                fragFile = open("." + fileName + "_" + str(fragIndex), "wb" )
+                fragFile.write(frag)
+                frag = bytes([])
+                fragIndex +=1
+                 
+        print(list(frag))
+        open("." + fileName + "_" + str(fragIndex), "wb" )
+        fragFile.write(frag)
+        
+        return fragIndex + 1
+        
+    def defragFile(self, fileName, numFrags):
+        
+        fileBytes = bytes([])    
+        
+        
+        for fragIndex in range(numFrags):
+            with open("." + fileName + "_" + str(fragIndex), 'rb') as fragBytes:
+                data = fragBytes.read()
+            fileBytes += data
+        
+        file = open(fileName, "wb" )
+        file.write(fileBytes)
+
+        
 
     def addFile(self, filePath):
 
@@ -80,8 +119,6 @@ class FS_Node:
         # TODO: support various fragSizes, increase depending on file size
         # Size 1MB > - fragSize 1 B - 8 bits
         # Size 1gb > - fragSize 1 MB 
-        
-        
 
         fileSize = len(data)
 
@@ -104,6 +141,8 @@ def main():
         node = FS_Node()
 
     node.addFile("../msgs/askFile.msg")
+    numfrags = node.fragFile("../msgs/askFile.msg",8)
+    node.defragFile("askFile.msg",numfrags)
     msg = node.createMsg("UPDATE NODE")
     node.sendTcpMsg(msg)
 
