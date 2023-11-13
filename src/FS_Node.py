@@ -28,7 +28,8 @@ class FS_Node:
         self.soc.connect((self.endereco, self.porta))
 
         self.nodeId = f"{self.endereco}"
-        self.contents = {}
+        self.contents = {} # Dict: { key=fileName: value=[fileSize, [Fragments], fileHash] }
+        
 
     def sendTcpMsg(self, msg):
 
@@ -54,7 +55,10 @@ class FS_Node:
     def createMsg(self, MSG_TYPE, BODY={}):
 
         if MSG_TYPE == "UPDATE NODE":
-            BODY = self.contents
+            newBody = {}
+            for value in self.contents.values():
+                newBody[value[2]] = [value[0],value[1]]
+            BODY = newBody
 
         msg = FS_Msg(self.hostname, self.endereco, MSG_TYPE, BODY)
 
@@ -103,15 +107,12 @@ class FS_Node:
 
         with open(filePath, 'rb') as file:
             data = file.read()  # .replace('\n',' ')
-            hash256 = hashlib.sha256(data).hexdigest()
+            hash256 = hashlib.shake_256(data).hexdigest(8)
             filename = filePath.split("/")[-1]
-            name_hash = [hash256,filename]
+            name_hash = (hash256,filename)
 
         fileSize = len(data)
 
-    
-
-        
         if fileSize < ONE_Kibit:
             fragSize = ONE_B
         elif fileSize < ONE_kiB:
@@ -121,13 +122,9 @@ class FS_Node:
         else:
             fragSize = ONE_MiB
 
-        
-
         numFrags = int(fileSize / fragSize)
 
         lastFragSize = fileSize - (numFrags * fragSize)
-
-        
 
         self.contents[name_hash[1]] = [fileSize, [True] * numFrags, name_hash[0]]
 
@@ -147,6 +144,8 @@ def main():
 
     format = "%(asctime)s: %(message)s"
     logging.basicConfig(format=format, level=logging.INFO)
+
+    print(node.contents)
 
     while True:
         print("Node > ", end="")
