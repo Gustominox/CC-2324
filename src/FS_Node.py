@@ -123,13 +123,22 @@ class FS_Node:
         else:
             fragSize = ONE_MiB
 
-        self.fragFile(filePath,fragSize)
+        if (int(fileSize) % fragSize)==0:
+            numFrags = int(fileSize / fragSize)
+            lastFragSize = fragSize
+        else:
+            numFrags = int(fileSize / fragSize) + 1
+            lastFragSize = fileSize - ((numFrags-1) * fragSize)
+        
+
+        self.contents[name_hash[0]] = [fileSize, [True] * numFrags, name_hash[1], fragSize, lastFragSize]
+
         
         numFrags = int(fileSize / fragSize)
 
         lastFragSize = fileSize - (numFrags * fragSize)
 
-        self.contents[name_hash[1]] = [fileSize, [True] * numFrags, name_hash[0]]
+        return name_hash[0]
 
 
 def main():
@@ -139,11 +148,9 @@ def main():
     else:
         node = FS_Node()
 
-    node.addFile("../msgs/askFile.msg")
-    node.addFile("../msgs/updateLegionGusto.msg")
-    
-    # node.defragFile("askFile.msg",numfrags)
-    
+    key = node.addFile("../msgs/askFile.msg")
+    numfrags = node.fragFile("../msgs/askFile.msg",node.contents[key][3])
+    node.defragFile("askFile.msg",numfrags)
     msg = node.createMsg("UPDATE NODE")
     node.sendTcpMsg(msg)
 
@@ -172,7 +179,8 @@ def main():
         elif option == "add":
             print("Insert File > ", end="")
             filePath = input()
-            node.addFile(filePath)
+            key = node.addFile(filePath)
+            node.fragFile(filePath,node.contents[key][3])
 
         elif option == "list":
 
