@@ -6,22 +6,6 @@ import hashlib
 from FS_MSG import FS_Msg
 
 
-cont = {
-    "FILE1": [
-        128,
-        [
-            0, 0, 0, 0, 0]  
-    ],
-    "FILE2": [
-        0,
-        [0, 0, 0, 0, 0]
-    ],
-    "FILE3": [
-        512,
-        [0, 0, 0, 0, 0]
-    ]
-}
-
 
 class FS_Node:
 
