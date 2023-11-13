@@ -66,6 +66,8 @@ class FS_Node:
     
     def fragFile(self, filePath, fragSize):
         
+        fragDir = "./frags/"
+        
         fileName = filePath.split("/")[-1]
         
         with open(filePath, 'rb') as file:
@@ -77,13 +79,13 @@ class FS_Node:
             frag += bytes([byte])
             if len(frag) == fragSize:
                 print(list(frag))
-                fragFile = open("." + fileName + "_" + str(fragIndex), "wb" )
+                fragFile = open(fragDir + fileName + "_" + str(fragIndex), "wb" )
                 fragFile.write(frag)
                 frag = bytes([])
                 fragIndex +=1
                  
         print(list(frag))
-        open("." + fileName + "_" + str(fragIndex), "wb" )
+        open(fragDir + fileName + "_" + str(fragIndex), "wb" )
         fragFile.write(frag)
         
         return fragIndex + 1
@@ -112,7 +114,6 @@ class FS_Node:
             name_hash = (hash256,filename)
 
         fileSize = len(data)
-
         if fileSize < ONE_Kibit:
             fragSize = ONE_B
         elif fileSize < ONE_kiB:
@@ -122,6 +123,8 @@ class FS_Node:
         else:
             fragSize = ONE_MiB
 
+        self.fragFile(filePath,fragSize)
+        
         numFrags = int(fileSize / fragSize)
 
         lastFragSize = fileSize - (numFrags * fragSize)
@@ -137,8 +140,10 @@ def main():
         node = FS_Node()
 
     node.addFile("../msgs/askFile.msg")
-    numfrags = node.fragFile("../msgs/askFile.msg",8)
-    node.defragFile("askFile.msg",numfrags)
+    node.addFile("../msgs/updateLegionGusto.msg")
+    
+    # node.defragFile("askFile.msg",numfrags)
+    
     msg = node.createMsg("UPDATE NODE")
     node.sendTcpMsg(msg)
 
