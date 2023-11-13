@@ -5,7 +5,14 @@ import json
 import hashlib
 from FS_MSG import FS_Msg
 
-
+ONE_Bit = 1
+ONE_B = 8
+ONE_kbit = 1000
+ONE_Kibit = 1024
+ONE_kB = 8000
+ONE_kiB = 8192
+ONE_MB = 8000000
+ONE_MiB = 8388608 
 
 class FS_Node:
 
@@ -100,13 +107,21 @@ class FS_Node:
             filename = filePath.split("/")[-1]
             name_hash = [hash256,filename]
 
-        # TODO: support various fragSizes, increase depending on file size
-        # Size 1MB > - fragSize 1 B - 8 bits
-        # Size 1gb > - fragSize 1 MB 
-
         fileSize = len(data)
 
-        fragSize = 8
+    
+
+        
+        if fileSize < ONE_Kibit:
+            fragSize = ONE_B
+        elif fileSize < ONE_kiB:
+            fragSize = ONE_Kibit
+        elif fileSize < ONE_MiB:
+            fragSize = ONE_kiB
+        else:
+            fragSize = ONE_MiB
+
+        
 
         numFrags = int(fileSize / fragSize)
 
