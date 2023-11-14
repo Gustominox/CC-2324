@@ -129,6 +129,8 @@ class FS_Node:
 
         lastFragSize = fileSize - (numFrags * fragSize)
 
+        if not lastFragSize == 0: numFrags += 1
+
         self.contents[name_hash[1]] = [fileSize, [True] * numFrags, name_hash[0]]
 
 
