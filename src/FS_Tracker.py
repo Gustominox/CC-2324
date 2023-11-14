@@ -23,7 +23,6 @@ class FS_Tracker:
         
         while True:
             data = connection.recv(1024)
-            logging.info("Received data")
             fullMessage = True
             
             if data:
@@ -61,6 +60,8 @@ class FS_Tracker:
                 message.read_message(current_message)
                 
                 if fullMessage:
+                    logging.info("Received TCP message")
+                    
                     if message.MSG_TYPE == "UPDATE NODE":
                         self.table.updateNode(message.SENDER_ID,message.BODY)
                         logging.info(f"UPDATE: {message.SENDER_ID}")
@@ -73,8 +74,8 @@ class FS_Tracker:
                     elif message.MSG_TYPE == "ASK FILE":
                         
                         node_list = self.table.getNodesWithFilename(message.BODY)
-                        print(f"NODE LIST: \n{node_list}")
-                        connection.send(f"{node_list}".encode('utf-8'))
+                        connection.send(str(node_list).encode('utf-8'))
+                        logging.info(f"ASK RESPONSE: {message.SENDER_ID}")
                         
                     elif message.MSG_TYPE == "END TRACKER":
                         pass
