@@ -3,6 +3,8 @@ import sys
 import logging
 import json
 import hashlib
+import ast
+from FS_Tracker_Table import FS_Table
 from FS_MSG import FS_Msg
 
 ONE_Bit = 1
@@ -16,7 +18,7 @@ ONE_MiB = 8388608
 
 class FS_Node:
 
-    def __init__(self, hostname, port=9090):
+    def __init__(self, hostname, trackerIp="127.0.0.1", port=9090):
 
         # self.startTime = datetime.now()
         self.soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
@@ -25,18 +27,19 @@ class FS_Node:
         self.hostname = hostname
         self.endereco = socket.gethostbyname(self.hostname)
         self.porta = port
-        self.soc.connect((self.endereco, self.porta))
-
+        self.soc.connect((trackerIp, self.porta))
+        
         self.nodeId = f"{self.endereco}"
         self.contents = {} # Dict: { key=fileName: value=[fileSize, [Fragments], fileHash] }
         
+        self.p2pInfo = {} # Dict: { key=}
+
 
     def sendTcpMsg(self, msg):
 
         message = msg.toText()
 
         try:
-            print(f"Sending: {message}")
             self.soc.sendall(message.encode('utf-8'))
         except:
             print("Impossivel Conectar")
@@ -46,8 +49,14 @@ class FS_Node:
 
             message = self.soc.recv(1024)
             line = message.decode('utf-8')
-            print(line)
-
+            
+            d = ast.literal_eval(line)
+            
+            for fileHash, lista in d.items():
+                self.p2pInfo[fileHash] = lista
+            
+            # askFile : '8016d714d9cf5bb0', upLegion : '98d2da068043296c'
+        
         else:
             pass
 
@@ -78,13 +87,11 @@ class FS_Node:
         for byte in data:
             frag += bytes([byte])
             if len(frag) == fragSize:
-                print(list(frag))
                 fragFile = open(fragDir + fileName + "_" + str(fragIndex), "wb" )
                 fragFile.write(frag)
                 frag = bytes([])
                 fragIndex +=1
                  
-        print(list(frag))
         open(fragDir + fileName + "_" + str(fragIndex), "wb" )
         fragFile.write(frag)
         
@@ -146,7 +153,7 @@ class FS_Node:
 def main():
 
     if len(sys.argv) > 1:
-        node = FS_Node(sys.argv[1],int(sys.argv[2]))
+        node = FS_Node(sys.argv[1],"127.0.0.6",int(sys.argv[2]))
     else:
         node = FS_Node()
 
@@ -158,9 +165,7 @@ def main():
 
     format = "%(asctime)s: %(message)s"
     logging.basicConfig(format=format, level=logging.INFO)
-
-    print(node.contents)
-
+    
     while True:
         print("Node > ", end="")
 
@@ -172,14 +177,24 @@ def main():
             node.sendTcpMsg(msg)
 
         elif option == "ask":
-            file = input()
+            body = {}
+            while (True):
+                print("Insert empty file hash to send!!\nInsert search file hash > ", end="")
+                file = input()
+                if file == "": break
+                body[file] = "NONE"
 
-            BODY = {file: "NONE"}
-            msg = node.createMsg("ASK FILE", BODY)
+            msg = node.createMsg("ASK FILE", body)
+            
+            # print("Insert File Name to store  > ", end="")
+            # file = input()
+            
             node.sendTcpMsg(msg)
+            
+            print (node.p2pInfo)
 
         elif option == "add":
-            print("Insert File > ", end="")
+            print("Insert file name > ", end="")
             filePath = input()
             key = node.addFile(filePath)
             node.fragFile(filePath,node.contents[key][3])
@@ -195,9 +210,17 @@ def main():
             node.soc.close()
             logging.info("Terminate normal execution")
             break
-
+        elif option == "help":
+        
+            print("\nAvailable commands:")
+            print("update - Update the node")
+            print("ask    - Ask for a file with its hash")
+            print("add    - Add a file to the node")
+            print("list   - List the contents of the node")
+            print("exit   - Exit the program\n")
+        
         else:
-            logging.info("Unknown Option")
+            print("Unknown Option!!!\nTry help for options.")
 
 
 if __name__ == "__main__":
