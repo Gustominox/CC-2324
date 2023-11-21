@@ -18,7 +18,7 @@ ONE_MiB = 8388608
 
 class FS_Node:
 
-    def __init__(self, hostname, port=9090):
+    def __init__(self, hostname, trackerIp="127.0.0.1", port=9090):
 
         # self.startTime = datetime.now()
         self.soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
@@ -27,8 +27,8 @@ class FS_Node:
         self.hostname = hostname
         self.endereco = socket.gethostbyname(self.hostname)
         self.porta = port
-        self.soc.connect((self.endereco, self.porta))
-
+        self.soc.connect((trackerIp, self.porta))
+        
         self.nodeId = f"{self.endereco}"
         self.contents = {} # Dict: { key=fileName: value=[fileSize, [Fragments], fileHash] }
         
@@ -144,7 +144,7 @@ class FS_Node:
 def main():
 
     if len(sys.argv) > 1:
-        node = FS_Node(sys.argv[1],int(sys.argv[2]))
+        node = FS_Node(sys.argv[1],"127.0.0.6",int(sys.argv[2]))
     else:
         node = FS_Node()
 
