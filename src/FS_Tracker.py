@@ -64,12 +64,12 @@ class FS_Tracker:
                     
                     if message.MSG_TYPE == "UPDATE NODE":
                         self.table.updateNode(message.SENDER_ID,message.BODY)
-                        logging.info(f"UPDATE: {message.SENDER_ID}")
+                        logging.info(f"UPDATE: {message.SENDER_ID}@{message.SENDER_IP}")
 
                     elif message.MSG_TYPE == "DELETE NODE":
                         
                         self.table.removeNode(message.SENDER_ID)
-                        logging.info(f"REMOVE: {message.SENDER_ID}")
+                        logging.info(f"REMOVE: {message.SENDER_ID}@{message.SENDER_IP}")
                         
                     elif message.MSG_TYPE == "ASK FILE":
                         
@@ -97,14 +97,14 @@ def main():
     format = "%(asctime)s: %(message)s"
     logging.basicConfig(format=format, level=logging.INFO)
     if len(sys.argv) > 1:
-        tracker = FS_Tracker(int(sys.argv[1]))
+        tracker = FS_Tracker(int(sys.argv[2]))
     else:
         tracker = FS_Tracker()
         
     
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
-    soc.bind(('', tracker.porta))            
+    soc.bind((sys.argv[1], tracker.porta))            
     soc.listen()
     
 
