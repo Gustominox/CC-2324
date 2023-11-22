@@ -142,7 +142,7 @@ class FS_Node:
 
         self.contents[name_hash[1]] = [fileSize, [True] * numFrags, name_hash[0]]
 
-    def menu(node):
+    def menu(self,node):
         while True:
             print("Node > ", end="")
 
@@ -202,7 +202,7 @@ def main():
 
     print(node.contents)
 
-    menu = threading.Thread(target=menu, args=(node))
+    menu = threading.Thread(target=node.menu, args=([node]))
 
 
 
