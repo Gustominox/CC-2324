@@ -1,4 +1,3 @@
-import sys
 import time
 import struct
 import hashlib
@@ -110,4 +109,10 @@ class FS_Mediator:
 
             hashName, fragIndex, tempo = self.parseHeader(data)
             #TODO: Adicionar uma tabela com chave hash+index+ip->tempo e chamar a função fastestConn
+
+    def mediator(self, socket):
+        while(True):
+            data, addr = socket.recvfrom(1024)
+
+            self.headerMediator(data,addr[0])
         

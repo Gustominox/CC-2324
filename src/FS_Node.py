@@ -204,9 +204,17 @@ def main():
 
     menu = threading.Thread(target=node.menu, args=([node]))
 
-
-
     menu.start()
+
+    sockUDP = socket.socket(socket.AF_INET, # Internet
+                         socket.SOCK_DGRAM) # UDP
+    
+    sockUDP.bind(('0.0.0.0', 9090))
+
+    med=FS_Mediator(sockUDP,"./frags/")
+    
+    mediator = threading.Thread(target=med.mediator, args=(sockUDP))
+
     
 
 if __name__ == "__main__":
