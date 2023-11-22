@@ -9,27 +9,31 @@ from FS_Transfer import FS_transfer
     # É necessário multithreading
 
 #Tamanhos dos componentes dos headers
-PACKET_SIZE = 1024
 ASK_SEND_FLAG = 2
-FRAG_SIZE = 32
 HASH_SIZE = 32
 FRAG_INDEX_SIZE = 32
-PAYLOAD_SIZE = 32
-HEADER_RECV = ASK_SEND_FLAG + HASH_SIZE + FRAG_INDEX_SIZE + FRAG_SIZE + PAYLOAD_SIZE #header de pedido ao receber
-HEADER_SEND = ASK_SEND_FLAG + HASH_SIZE + FRAG_INDEX_SIZE + 64 #header de pedido para enviar
-PAYLOAD=PACKET_SIZE-HEADER_RECV
+FRAG_SIZE = 32
+TIME_SIZE = 64
+PAYLOAD=1024
+#header de pedido para receber fragmento: Composto por 2bitflag, hash, fragIndex, fragSize + fill até 136 bits (38 bits fill)
+HEADER_RECV = ASK_SEND_FLAG + HASH_SIZE + FRAG_INDEX_SIZE + FRAG_SIZE
+#header de pedido para enviar fragmento: COmposto por 2bitflag, hash, fragIndex, timeSince + fill até 136 bits (6 bits fill)
+HEADER_PING = ASK_SEND_FLAG + HASH_SIZE + FRAG_INDEX_SIZE + TIME_SIZE
+HEADER_MAX = max(HEADER_PING,HEADER_RECV) + (8 - (max(HEADER_PING,HEADER_RECV) % 8)) #136 bits
+PACKET_SIZE = HEADER_MAX + PAYLOAD
+PAYLOAD_BYTES = (PAYLOAD + 7) // 8
 
 class FS_Mediator:
 
     def __init__(self, sock, fragDir):
         self.sock = sock
         self.fragDir = fragDir
-        self.transfer = FS_transfer()
+        self.transfer = FS_transfer(sock)
 
     def parseHeader (data): # recebe a data em bytes e retorna hashName em hex, payload em bytes e o resto em int
         
         bitString = ''.join(format(byte, '08b') for byte in data)
-        
+
         #Flag do tipo de mensagem (Receber fragmento, enviar fragmento ou ping)
         tipoMsg = int(bitString[:ASK_SEND_FLAG])
 
@@ -39,35 +43,30 @@ class FS_Mediator:
         #Índice Fragmento
         fragIndex = int(bitString[ASK_SEND_FLAG+HASH_SIZE:ASK_SEND_FLAG+HASH_SIZE+FRAG_INDEX_SIZE])
 
-        if(tipoMsg==2): #pedido de ping (cálculo da diferença de tempo)
-            endTime = time.time()
-            startTimeBit = bitString[ASK_SEND_FLAG+HASH_SIZE+FRAG_INDEX_SIZE:ASK_SEND_FLAG+HASH_SIZE+FRAG_INDEX_SIZE+64] # float tem tamanho de 64 bits 
+        if(tipoMsg==2): ## Pedido de Ping (cálculo da diferença de tempo)
+            endTime = int(time.time())
+            startTimeBit = bitString[HEADER_PING-TIME_SIZE:HEADER_PING] # float tem tamanho de 64 bits 
             startTimeBytes = int(startTimeBit, 2).to_bytes(len(startTimeBit) // 8, byteorder='big')
-            startTime = struct.unpack('>d', startTimeBytes)[0]
+            startTime = struct.unpack('>d', startTimeBytes)[0] #BUG Verificar isto
 
             return hashName, fragIndex, (endTime - startTime)
 
         if(tipoMsg==0): ## Receber Fragmentos
 
             # fragSize
-            fragSize = int(bitString[HEADER_RECV-PAYLOAD_SIZE-FRAG_SIZE:HEADER_RECV-PAYLOAD_SIZE])
-
-            # payloadSize > 0 (ultimo frag)
-            payloadSize = int(bitString[HEADER_RECV-PAYLOAD_SIZE:HEADER_RECV])
+            fragSize = int(bitString[HEADER_RECV-FRAG_SIZE:HEADER_RECV])
 
             # payload
-            payload = bitString[HEADER_RECV:].encode('utf-8')
+            payload = bitString[HEADER_MAX:HEADER_MAX+fragSize].encode('utf-8')
 
-            return hashName, fragIndex, fragSize, payloadSize, payload
+            return hashName, fragIndex, fragSize, payload
         
         else: ## Pedido de envio de fragmentos
             
             return hashName, fragIndex
         
-    def verifyHash(self,filePath,hashName,fragIndex):
-        file = open(filePath, 'rb')
-        data = file.read()
-        verHash = hashlib.shake_256(data).hexdigest(8)
+    def verifyHash(self,filePath,fileData,hashName,fragIndex):
+        verHash = hashlib.shake_256(fileData).hexdigest(8)
         if(verHash == hashName):
             print(f"Fragment {hashName}_{fragIndex} has been received correctly")
             return 1
@@ -81,46 +80,34 @@ class FS_Mediator:
         fastestIp = min(ipList, key=lambda x: x[1])
         return fastestIp
 
+    def headerMediator(self,data,ip):
+        if((data[0] & 0b11000000) == 0): ## Receber fragmentos
 
-    def main():
-        if len(sys.argv) <= 1:
-            print("Error opening Mediator: no hostname provided")
-        else:
-            mediator = FS_Mediator(sys.argv[1])
-            while True:
-                data, addr = mediator.sock.recvfrom(PACKET_SIZE) #TODO: Ver como escolher os vários pacotes
- 
+            hashName, fragIndex, fragSize, payload = self.parseHeader(data)
 
-                if((data[0] & 0b11000000) == 0): ## Receber fragmentos
+            filePath = self.fragDir + hashName + "_" + str(fragIndex)
 
-                    hashName, fragIndex, fragSize, payloadSize, payload = mediator.parseHeader(data)
+            frag += payload[:fragSize]
 
-                    filePath = mediator.fragDir + hashName + "_" + str(fragIndex)
-                    
-                    #TODO: Ver onde guardar este frag
-                    if(payloadSize!=0): # verifica ultimo fragmento
-                        frag += payload[:payloadSize]
-                        file = open(filePath, 'wb') # Verificar antes da escrita
-                        file.write(frag)
-                        file.close()
+            with open(filePath, 'w+b') as file:
+                file.write(frag)
+                fileData = file.read()
 
-                        if((mediator.verifyHash(filePath,hashName,fragIndex))==0): #Caso falhe a verificação
-                            mediator.transfer.askFrag(hashName,fragIndex,addr[0])
-                        
-                        
-                    frag += payload
-                      
-                elif(data[0] & 0b11000000 == 1): # Enviar fragmentos
+            if((self.verifyHash(filePath,fileData,hashName,fragIndex))==0): #Caso falhe a verificação
+                self.transfer.askFrag(hashName,fragIndex,ip)
+        
+        elif(data[0] & 0b11000000 == 1): # Enviar fragmentos
 
-                    hashName, fragIndex = mediator.parseHeader(data)
+            hashName, fragIndex = self.parseHeader(data)
 
-                    with open(mediator.fragDir + hashName + "_" + str(fragIndex), 'rb') as file:
-                        fragSize = len(file)
-                    
-                    mediator.transfer.sendFrag(mediator.sock,addr[0],fragSize,mediator.fragDir,hashName,fragIndex)
-                    break#TODO: Falta ver onde vamos guardar a informação relevante a cada fragmento ou escrevemos em ficheiro até ficar completo?
-                
-                else:
-                    hashName, fragIndex, tempo = mediator.parseHeader(data)
-                    #TODO: Adicionar uma tabela com chave hash+index+ip->tempo e chamar a função fastestConn
-                   
+            with open(self.fragDir + hashName + "_" + str(fragIndex), 'rb') as file:
+                fragSize = len(file)
+            
+            #TODO: Falta ver onde vamos guardar a informação relevante a cada fragmento ou escrevemos em ficheiro até ficar completo
+            self.transfer.sendFrag(self.sock,ip,fragSize,self.fragDir,hashName,fragIndex)
+
+        else: # Ping
+
+            hashName, fragIndex, tempo = self.parseHeader(data)
+            #TODO: Adicionar uma tabela com chave hash+index+ip->tempo e chamar a função fastestConn
+        

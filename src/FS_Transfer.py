@@ -1,91 +1,83 @@
-import socket
 import struct
 import time
-from FS_Mediator import FRAG_SIZE, HASH_SIZE, FRAG_INDEX_SIZE, PAYLOAD_SIZE, PAYLOAD, PACKET_SIZE, HEADER_SEND
+from FS_Mediator import FRAG_SIZE, HASH_SIZE, FRAG_INDEX_SIZE, PAYLOAD, PAYLOAD_BYTES, HEADER_MAX
 
 class FS_transfer:
-    
-    def __init__(self):
-        self #TODO: Ver o que falta na inicialização
 
+    def __init__(self,socket):
+        self.socket=socket
+
+
+    def rightPaddingBytes(data, length):
+        paddingLength = max(length - len(data), 0)
+        padding = bytes(paddingLength) 
+        return data + padding
     
-    def sendFrag(socket, ip, fragSize, fragDir, hashName, fragIndex): #os args são convertidos em bits e adicionados a um header
+
+    def rightPaddingBits(data, length):
+        paddingLength = max(length - len(data), 0)
+        padding = '0' * paddingLength
+        return data + padding
+
+
+    def sendFrag(self, socket, ip, fragSize, fragDir, hashName, fragIndex): #os args são convertidos em bits e adicionados a um header
         with open(fragDir + hashName + "_" + str(fragIndex), 'rb') as file: #o ficheiro vai ter de estar guardado com o hash em vez do nome
+
+            data = file.read(PAYLOAD)
+            data = self.rightPaddingBytes(data,PAYLOAD_BYTES) # padding
+
+            if not data: #EOF
+                print(f"Data of {hashName} with fragment number {int(fragIndex)} should have been sent correctly")
             
-            while True:
+            #hashName para Bits
+            hashNameBits = format(int(hashName, 16), f'0{HASH_SIZE}b')
+            
+            #IndiceFrag para Bits
+            fragIndexBits = bin(fragIndex)[2:].zfill(FRAG_INDEX_SIZE)
+            
+            #fragSize para Bits
+            fragSizeBits = bin(fragSize)[2:].zfill(FRAG_SIZE)
+            
+            #formar o header em bytes
+            headerInc = "00" + hashNameBits + fragIndexBits + fragSizeBits
+            headerInc = self.rightPaddingBits(headerInc,HEADER_MAX)
+            header = int(headerInc, 2).to_bytes(HEADER_MAX // 8, byteorder='big')
+            
+            packet = header + data
+            
+            self.socket.sendto(packet, (ip, 9090))
 
-                data = file.read(PAYLOAD)
 
-                if not data: #EOF
-                    print(f"Data of {hashName} with fragment number {int(fragIndex)} should have been sent correctly")
-                    break
-
-                #hashName para Bits
-                hashNameBits = format(int(hashName, 16), f'0{HASH_SIZE}b')
-
-                #IndiceFrag para Bits
-                fragIndexBits = bin(fragIndex)[2:].zfill(FRAG_INDEX_SIZE)
-
-                #fragSize para Bits
-                fragSizeBits = bin(fragSize)[2:].zfill(FRAG_SIZE)
-
-                #formar o header sem a última flag de ultimo bloco de fragmento
-                headerInc = "00" + hashNameBits + fragIndexBits + fragSizeBits
-             
-
-                if (len(data)) < PAYLOAD: #Caso do ultimo fragmento
-                    payload = ''.join(format(byte, '08b') for byte in data)
-                    c=0
-                    while (len(payload) < PAYLOAD): #preenche o pacote com 0's à direita
-                        payload <<= 1
-                        c+=1
-                    
-                    payloadSize=(bin(c)[2:]).zfill(PAYLOAD_SIZE)
-                    header = headerInc + payloadSize
-                    packet = header + payload
-                    socket.sendto(packet, (ip, 9090))
-
-                else:
-                    header = headerInc + '0' * PAYLOAD_SIZE
-                    
-                    packetBytes = int(header, 2).to_bytes(PACKET_SIZE // 8, byteorder='big') + ''.join(format(byte, '08b') for byte in data)
-
-                    socket.sendto(packetBytes, (ip, 9090))
-    
-    def askFrag(socket, hashName, Index, ip):
-        headerInc = "01"
+    def askFrag(self, socket, hashName, Index, ip):
+        
         hashNameBits = format(int(hashName, 16), f'0{HASH_SIZE}b')
+        
         fragIndexBits = bin(Index)[2:].zfill(FRAG_INDEX_SIZE)
        
-        header = headerInc + hashNameBits + fragIndexBits
-        packet = header.zfill(PACKET_SIZE)
+        headerInc = "01" + hashNameBits + fragIndexBits
 
-        packetBytes = int(header, 2).to_bytes(PACKET_SIZE // 8, byteorder='big')
+        header = self.rightPaddingBits(headerInc,HEADER_MAX)
+        
+        packet = int(header, 2).to_bytes(HEADER_MAX // 8, byteorder='big')
 
-        socket.sendto(packetBytes, (ip,9090))
+        self.socket.sendto(packet, (ip, 9090))
 
-    def ping(socket,hashName,fragIndex, ip): #TODO: rever formato do pacote do ping (vale a pena mandar o hashName + fragIndex?) + onde chamar
-        startTime=time.time()
+
+    def ping(self, socket, hashName, fragIndex, ip):
+        
+        startTime=int(time.time())
         startTimeBytes=struct.pack('>d', startTime)
 
         hashNameBits = format(int(hashName, 16), f'0{HASH_SIZE}b')
 
         fragIndexBits = bin(fragIndex)[2:].zfill(FRAG_INDEX_SIZE)
 
-        header = "10" + hashNameBits + fragIndexBits + fragIndexBits
+        headerInc = "10" + hashNameBits + fragIndexBits + startTimeBytes
 
-        headerBytes = int(header, 2).to_bytes(HEADER_SEND // 8, byteorder='big')
-        packet = headerBytes + startTimeBytes
+        header = self.rightPaddingBits(headerInc,HEADER_MAX)
 
-        socket.sendto(packet, (ip, 9090))
+        packet = int(header, 2).to_bytes(HEADER_MAX // 8, byteorder='big')
+
+        self.socket.sendto(packet, (ip, 9090))
 
         return startTimeBytes
-
-        
-
-
-
-
-
-
-

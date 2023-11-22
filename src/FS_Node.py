@@ -5,7 +5,9 @@ import json
 import hashlib
 import ast
 from FS_Tracker_Table import FS_Table
+import threading
 from FS_MSG import FS_Msg
+from FS_Mediator import FS_Mediator
 
 ONE_Bit = 1
 ONE_B = 8
@@ -140,6 +142,45 @@ class FS_Node:
 
         self.contents[name_hash[1]] = [fileSize, [True] * numFrags, name_hash[0]]
 
+    def menu(node):
+        while True:
+            print("Node > ", end="")
+
+            option = input()
+
+            if option == "update":
+
+                msg = node.createMsg("UPDATE NODE")
+                node.sendTcpMsg(msg)
+
+            elif option == "ask":
+                file = input()
+
+                BODY = {file: "NONE"}
+                msg = node.createMsg("ASK FILE", BODY)
+                node.sendTcpMsg(msg)
+
+            elif option == "add":
+                print("Insert File > ", end="")
+                filePath = input()
+                key = node.addFile(filePath)
+                node.fragFile(filePath,node.contents[key][3])
+
+            elif option == "list":
+
+                print(json.dumps(node.contents, indent=4))
+
+            elif option == "exit":
+
+                msg = node.createMsg("DELETE NODE")
+                node.sendTcpMsg(msg)
+                node.soc.close()
+                logging.info("Terminate normal execution")
+                break
+
+            else:
+                logging.info("Unknown Option")
+
 
 def main():
 
@@ -158,62 +199,15 @@ def main():
 
     format = "%(asctime)s: %(message)s"
     logging.basicConfig(format=format, level=logging.INFO)
+
+    print(node.contents)
+
+    menu = threading.Thread(target=menu, args=(node))
+
+
+
+    menu.start()
     
-    while True:
-        print("Node > ", end="")
-
-        option = input()
-
-        if option == "update":
-
-            msg = node.createMsg("UPDATE NODE")
-            node.sendTcpMsg(msg)
-
-        elif option == "ask":
-            body = {}
-            while (True):
-                print("Insert empty file hash to send!!\nInsert search file hash > ", end="")
-                file = input()
-                if file == "": break
-                body[file] = "NONE"
-
-            msg = node.createMsg("ASK FILE", body)
-            
-            # print("Insert File Name to store  > ", end="")
-            # file = input()
-            
-            node.sendTcpMsg(msg)
-            
-            print (f"Onde estao: \n{json.dumps(node.p2pInfo)}")
-
-        elif option == "add":
-            print("Insert file name > ", end="")
-            filePath = input()
-            node.addFile(filePath)
-
-        elif option == "list":
-
-            print(json.dumps(node.contents, indent=4))
-
-        elif option == "exit":
-
-            msg = node.createMsg("DELETE NODE")
-            node.sendTcpMsg(msg)
-            node.soc.close()
-            logging.info("Terminate normal execution")
-            break
-        elif option == "help":
-        
-            print("\nAvailable commands:")
-            print("update - Update the node")
-            print("ask    - Ask for a file with its hash")
-            print("add    - Add a file to the node")
-            print("list   - List the contents of the node")
-            print("exit   - Exit the program\n")
-        
-        else:
-            print("Unknown Option!!!\nTry help for options.")
-
 
 if __name__ == "__main__":
     main()
