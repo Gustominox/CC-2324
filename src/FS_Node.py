@@ -20,7 +20,7 @@ ONE_MiB = 8388608
 
 class FS_Node:
 
-    def __init__(self, hostname, trackerIp="127.0.0.1", port=9090):
+    def __init__(self, hostname, port ,trackerIp ):
 
         # self.startTime = datetime.now()
         self.soc = socket.socket(socket.AF_INET,     # Familia de enderecos ipv4
@@ -184,8 +184,12 @@ class FS_Node:
 
 def main():
 
+    host_name = sys.argv[1]
+    port = int(sys.argv[2])
+    tracker_ip = sys.argv[3]
+
     if len(sys.argv) > 1:
-        node = FS_Node(sys.argv[1],"127.0.0.6",int(sys.argv[2]))
+        node = FS_Node(host_name,port,tracker_ip)
     else:
         node = FS_Node()
 
@@ -199,14 +203,61 @@ def main():
 
     format = "%(asctime)s: %(message)s"
     logging.basicConfig(format=format, level=logging.INFO)
+    
+    while True:
+        print("Node > ", end="")
 
-    print(node.contents)
+        option = input()
 
-    menu = threading.Thread(target=node.menu, args=([node]))
+        if option == "update":
 
+            msg = node.createMsg("UPDATE NODE")
+            node.sendTcpMsg(msg)
 
+        elif option == "ask":
+            body = {}
+            while (True):
+                print("Insert empty file hash to send!!\nInsert search file hash > ", end="")
+                file = input()
+                if file == "": break
+                body[file] = "NONE"
 
-    menu.start()
+            msg = node.createMsg("ASK FILE", body)
+            
+            # print("Insert File Name to store  > ", end="")
+            # file = input()
+            
+            node.sendTcpMsg(msg)
+            
+            print (f"Onde estao: \n{json.dumps(node.p2pInfo)}")
+
+        elif option == "add":
+            print("Insert file name > ", end="")
+            filePath = input()
+            node.addFile(filePath)
+
+        elif option == "list":
+
+            print(json.dumps(node.contents, indent=4))
+
+        elif option == "exit":
+
+            msg = node.createMsg("DELETE NODE")
+            node.sendTcpMsg(msg)
+            node.soc.close()
+            logging.info("Terminate normal execution")
+            break
+        elif option == "help":
+        
+            print("\nAvailable commands:")
+            print("update - Update the node")
+            print("ask    - Ask for a file with its hash")
+            print("add    - Add a file to the node")
+            print("list   - List the contents of the node")
+            print("exit   - Exit the program\n")
+        
+        else:
+            print("Unknown Option!!!\nTry help for options.")
     
 
 if __name__ == "__main__":
