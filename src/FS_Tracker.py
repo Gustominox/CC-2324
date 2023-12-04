@@ -8,15 +8,27 @@ from FS_MSG import FS_Msg
 class FS_Tracker:
 
 
-    def __init__(self, port = 9090):
+    def __init__(self,hostName, port = 9090):
 
         # self.startTime = datetime.now()
         self.table = FS_Table()
-        self.hostname = socket.gethostname()
+        self.hostname = hostName
         self.endereco = socket.gethostbyname(self.hostname)  
         self.porta = port
         
     
+    def openTcpConnection(self):
+        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+        soc.bind((self.endereco, self.porta))            
+        soc.listen()
+        
+
+        while True:
+            connection, address = soc.accept() 
+            tcp = threading.Thread(target=self.launchTcpConnection,args=(connection, address))
+            tcp.start()
+        
     def launchTcpConnection(self,connection, address):
         
         msg = ""
@@ -94,24 +106,17 @@ class FS_Tracker:
         
             
 def main():
+    
+    tracker_name = sys.argv[1]
+    port = int(sys.argv[2])
+    
     format = "%(asctime)s: %(message)s"
     logging.basicConfig(format=format, level=logging.INFO)
-    if len(sys.argv) > 1:
-        tracker = FS_Tracker(int(sys.argv[2]))
-    else:
-        tracker = FS_Tracker()
-        
     
-    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    tracker = FS_Tracker(tracker_name,port)
     
-    soc.bind((sys.argv[1], tracker.porta))            
-    soc.listen()
+    tracker.openTcpConnection()    
     
-
-    while True:
-        connection, address = soc.accept() 
-        tcp = threading.Thread(target=tracker.launchTcpConnection,args=(connection, address))
-        tcp.start()
         
     logging.info("ENDED NORMAL EXECUTION")
 
