@@ -1,6 +1,6 @@
 <img src='uminho.png' width="30%"/>
 
-<h3 align="center">Licenciatura em Engenharia Informática <br> Trabalho prático de Comunicação de Dados <br> 2023/2024 </h3>
+<h3 align="center">Licenciatura em Engenharia Informática <br> Trabalho prático de Comunicação de Computadores <br> 2023/2024 </h3>
 
 ---
 
